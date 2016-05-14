@@ -1,3 +1,4 @@
+@import url(https://fonts.googleapis.com/css?family=Merienda:700,400);
 *{
 	margin: 0;
 }
@@ -6,10 +7,16 @@ html,body{
 	width: 100%;
 }
 body{
-	//background: rgba(0, 0, 255, 0.72);
 	 background: linear-gradient(#0023FF 10%,rgba(187, 187, 255, 0.72) 80%,white);
-	overflow: hidden;
+		overflow-x: hidden;
+		overflow-y: auto;
 }
+div#section-one, div#section-two{
+	position: relative;
+	height: 100%;
+	width: 100%;
+}
+/*start - section one styles*/
 div.cloud:first-child{
 	//transform: translate("20px","50px");
 	top: 200px;
@@ -277,77 +284,10 @@ div#ocean{
     height:60%;
   }
 }
+/*end - section one styles*/
 
-#football{
-	height: 50px;
-	width: 65px;
-	position: relative;
-	top: 20px;
-	left: 20px;
-}
-.forward{
-	-webkit-animation-name:             rotateball; 
-	-webkit-animation-duration:             0.5s; 
-	-webkit-animation-iteration-count:  infinite;
-	-webkit-transition-timing-function: linear;
-}
-
-@-webkit-keyframes rotateball{
-  0%{
-    transform:rotate(0deg);
-  }
-  25%{ 
-    transform:rotate(90deg);
-  }
-  50%{ 
-    transform:rotate(180deg);
-  }
-  75%{ 
-    transform:rotate(270deg);
-  }
-  100%{ 
-    transform:rotate(360deg);
-  }
-}
-.backward{
-	-webkit-animation-name:             rotateballback; 
-	-webkit-animation-duration:             0.5s; 
-	-webkit-animation-iteration-count:  infinite;
-	-webkit-transition-timing-function: linear;
-}
-
-@-webkit-keyframes rotateballback{
-  0%{
-    transform:rotate(0deg);
-  }
-  25%{ 
-    transform:rotate(-90deg);
-  }
-  50%{ 
-    transform:rotate(-180deg);
-  }
-  75%{ 
-    transform:rotate(-270deg);
-  }
-  100%{ 
-    transform:rotate(-360deg);
-  }
-}
-.enemy{
+#section-two #container{
+	font-family: Merienda, Arial, Helvetica, sans-serif;
 	position: absolute;
-	bottom: 40px;
-	height: 50px;
-	width: 5px;
-	background: red;
-	left: 200px; 
-	transform: rotate(20deg);
-}
-.enemy-top{
-	position: absolute;
-	bottom : 90px;
-	height: 50px;
-	width: 5px;
-	background: red;
-	right: 100px; 
-	transform: rotate(20deg);
+	margin: auto;
 }

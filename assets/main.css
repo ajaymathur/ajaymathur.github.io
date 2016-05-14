@@ -156,7 +156,7 @@ div.cloud:after{
 	z-index:-3;
 }
 footer{
-	position: absolute;
+	position: fixed;
 	bottom: 0;
 	height: 40px;
 	width: 100%;
@@ -289,5 +289,44 @@ div#ocean{
 #section-two #container{
 	font-family: Merienda, Arial, Helvetica, sans-serif;
 	position: absolute;
-	margin: auto;
+	height: 100%;
+	width: 100%;
+	padding: 50px;
+	box-sizing: border-box;
+}
+#section-two #container .snapshot{
+	position: relative;
+	width: 50%;
+	height: 100%;
+	float: left;
+	box-sizing: inherit;
+	padding: 50px;
+}
+#section-two #container .snapshot .inner-snap{
+	width: 75%;
+	height: 75%;
+}
+#section-two #container .snapshot img{
+		border: 8px solid rgba(255,255,255,0.8);
+    border-radius: 20px;
+}
+#section-two #container .snapshot img.image-one{
+	width: 100%;
+	transform: rotate(-10deg);
+}
+#section-two #container .snapshot img.image-two{
+	width: 100%;
+	transform: rotate(10deg);
+	position: relative;
+	top: -70px;
+}
+#section-two #container .project-description{
+	position: relative;
+	width: 50%;
+	float: right;
+	box-sizing: inherit;
+	background: rgba(255,255,255,0.4);
+	border: 5px solid rgba(0,0,0,0.4);
+	padding: 50px;
+	line-height: 3em;
 }

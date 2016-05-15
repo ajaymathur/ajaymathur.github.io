@@ -375,6 +375,16 @@ div#section-three .content{
 	top: 0;
 	left: 0;
 }
+#tryGameBtn{
+	background: #ededed;
+	border: none;
+	width: 100%;
+	height: 2em;
+	border-radius: 10px;
+}
+#tryGameBtn:hover{
+	background: #dedede;
+}
 #closeFrame{
 	position: fixed;
 	top: 10px;

@@ -1,4 +1,6 @@
 $(document).ready(function(){
+	var bodyWidth = $("body").width();
+	var bodyHeight = $("body").height();
 	var temp;
 	var start = null;
 	var elements = document.getElementsByClassName("cloud");
@@ -7,7 +9,7 @@ $(document).ready(function(){
 	
 	var temp1 = [(parseInt(temp[0].substring(0,temp[0].length-2))),(parseInt(temp[1].substring(0,temp[1].length-2))),(parseInt(temp[2].substring(0,temp[2].length-2)))];
 	
-	var bodyWidth = $("body").width();
+	
 	
 	//animation for clouds
 	function step(timestamp) {

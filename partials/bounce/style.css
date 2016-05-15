@@ -1,0 +1,15 @@
+*{
+	margin: 0
+}
+#can{
+	background: tomato;
+}
+#scoreplate{
+	background: rgba(6, 0, 73, 0.58);
+	height: 80px;
+	text-align: center;
+}
+#scorept{
+	color:white;
+	font-size: 80px;
+}

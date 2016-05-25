@@ -2,11 +2,11 @@
 	margin: 0
 }
 #can{
-	background: tomato;
+	background: #2D2D2D;
 }
 #scoreplate{
-	background: rgba(6, 0, 73, 0.58);
-	height: 80px;
+	background: rgb(123, 130, 218);
+	height: 100px;
 	text-align: center;
 }
 #scorept{

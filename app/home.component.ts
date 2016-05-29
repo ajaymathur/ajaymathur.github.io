@@ -1,5 +1,5 @@
 import {Component} from 'angular2/core'
-import {CoursesService} from './courses.service'
+import {HomeService} from './home.service'
 import {AutoGrow} from './auto-grow.directive'
 @Component({
     selector: 'courses',
@@ -12,13 +12,13 @@ import {AutoGrow} from './auto-grow.directive'
             </li>
         </ul>
     `,
-    providers: [CoursesService],
+    providers: [HomeService],
     directives: [AutoGrow]
 })
 
-export class CoursesComponent {
+export class HomeComponent {
     coursesList: Array<String>;
-    constructor(couseService : CoursesService){
+    constructor(couseService : HomeService){
         this.coursesList = couseService.getCourses();
     }
 }

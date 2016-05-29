@@ -1,4 +1,4 @@
-System.register(['angular2/core', './courses.component'], function(exports_1, context_1) {
+System.register(['angular2/core', './home.component', './blog.component', 'angular2/router'], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -10,15 +10,21 @@ System.register(['angular2/core', './courses.component'], function(exports_1, co
     var __metadata = (this && this.__metadata) || function (k, v) {
         if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
     };
-    var core_1, courses_component_1;
+    var core_1, home_component_1, blog_component_1, router_1;
     var AppComponent;
     return {
         setters:[
             function (core_1_1) {
                 core_1 = core_1_1;
             },
-            function (courses_component_1_1) {
-                courses_component_1 = courses_component_1_1;
+            function (home_component_1_1) {
+                home_component_1 = home_component_1_1;
+            },
+            function (blog_component_1_1) {
+                blog_component_1 = blog_component_1_1;
+            },
+            function (router_1_1) {
+                router_1 = router_1_1;
             }],
         execute: function() {
             AppComponent = (function () {
@@ -28,9 +34,14 @@ System.register(['angular2/core', './courses.component'], function(exports_1, co
                 AppComponent = __decorate([
                     core_1.Component({
                         selector: 'my-app',
-                        template: '<h1>My First {{name}} 2 App</h1><courses></courses>',
-                        directives: [courses_component_1.CoursesComponent],
-                    }), 
+                        template: "\n    <nav>\n    <img src=\"assets/userDefined/css/images/logo.jpg\"/>\n    <ul><li [routerLink]='[\"Home\"]'>Home</li><li [routerLink]='[\"Blog\"]'>blog</li><li [routerLink]='[\"ConnectMe\"]'>Contact Me</li></ul>\n    </nav>\n    <section id=\"page\">\n        <section id=\"content\">\n            <section class=\"main-page\">\n                <article class=\"quote\">Born to Rule.</article>\n                <router-outlet></router-outlet>\n            </section>\n        </section>\n    </section>\n    ",
+                        directives: [router_1.ROUTER_DIRECTIVES],
+                    }),
+                    router_1.RouteConfig([
+                        { path: '/home', name: 'Home', component: home_component_1.HomeComponent, useAsDefault: true },
+                        { path: '/blog', name: 'Blog', component: blog_component_1.BlogComponent },
+                        { path: '/Contact', name: 'ConnectMe', component: blog_component_1.BlogComponent }
+                    ]), 
                     __metadata('design:paramtypes', [])
                 ], AppComponent);
                 return AppComponent;

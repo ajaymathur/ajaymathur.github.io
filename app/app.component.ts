@@ -1,6 +1,7 @@
 import {Component} from 'angular2/core';
 import {HomeComponent} from './home.component';
 import {BlogComponent} from './blog.component';
+import {ConnectComponent} from './connect.component'
 import { RouteConfig, ROUTER_DIRECTIVES, ROUTER_PROVIDERS } from 'angular2/router';
 
 @Component({
@@ -13,7 +14,6 @@ import { RouteConfig, ROUTER_DIRECTIVES, ROUTER_PROVIDERS } from 'angular2/route
     <section id="page">
         <section id="content">
             <section class="main-page">
-                <article class="quote">Born to Rule.</article>
                 <router-outlet></router-outlet>
             </section>
         </section>
@@ -25,7 +25,7 @@ import { RouteConfig, ROUTER_DIRECTIVES, ROUTER_PROVIDERS } from 'angular2/route
 @RouteConfig([
     {path: '/home',name:'Home',component:HomeComponent,useAsDefault: true},
     {path: '/blog',name:'Blog',component:BlogComponent},
-    {path: '/Contact',name:'ConnectMe',component:BlogComponent}
+    {path: '/Contact',name:'ConnectMe',component:ConnectComponent}
 ])
 
 export class AppComponent { 

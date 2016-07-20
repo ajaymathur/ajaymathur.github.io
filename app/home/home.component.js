@@ -1,4 +1,4 @@
-System.register(['angular2/core', './home.service', './auto-grow.directive'], function(exports_1, context_1) {
+System.register(['angular2/core', './home.service'], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -10,7 +10,7 @@ System.register(['angular2/core', './home.service', './auto-grow.directive'], fu
     var __metadata = (this && this.__metadata) || function (k, v) {
         if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
     };
-    var core_1, home_service_1, auto_grow_directive_1;
+    var core_1, home_service_1;
     var HomeComponent;
     return {
         setters:[
@@ -19,21 +19,24 @@ System.register(['angular2/core', './home.service', './auto-grow.directive'], fu
             },
             function (home_service_1_1) {
                 home_service_1 = home_service_1_1;
-            },
-            function (auto_grow_directive_1_1) {
-                auto_grow_directive_1 = auto_grow_directive_1_1;
             }],
         execute: function() {
             HomeComponent = (function () {
-                function HomeComponent(couseService) {
-                    this.coursesList = couseService.getCourses();
+                function HomeComponent(courseService) {
+                    this.courseService = courseService;
                 }
+                HomeComponent.prototype.ngOnInit = function () {
+                    this.getCourses();
+                };
+                HomeComponent.prototype.getCourses = function () {
+                    var _this = this;
+                    this.courseService.getCourses().then(function (courses) { _this.coursesList = courses; });
+                };
                 HomeComponent = __decorate([
                     core_1.Component({
                         selector: 'courses',
-                        template: "\n        <h3>Heading in courses</h3>\n        <input type=\"text\" autoGrow />\n        <ul>\n            <li *ngFor=\"#course of coursesList\">\n                {{course}}\n            </li>\n        </ul>\n    ",
-                        providers: [home_service_1.HomeService],
-                        directives: [auto_grow_directive_1.AutoGrow]
+                        template: "\n        <h2>Heading in courses</h2>\n        <div class=\"search\">\n            <input type=\"search\"/>\n        </div>\n        <div class=\"course-list\">\n            <div class=\"course-list-item\" *ngFor=\"#course of coursesList\">\n                <div class=\"course-list-item-image\">\n                    <img src=\"../../styles/images/home/1.png\"/>\n                </div>\n                <div class=\"course-list-item-description\">\n                    <h3>{{course.heading}}</h3>\n                    <div>{{course.hint}}</div>\n                    <div class=\"course-list-item-description-tags\">\n                        <ul>\n                            <li *ngFor=\"#tag of course.tags\">{{tag}}</li>\n                        </ul>\n                    </div>\n                </div>\n            </div>\n        </div>\n    ",
+                        providers: [home_service_1.HomeService]
                     }), 
                     __metadata('design:paramtypes', [home_service_1.HomeService])
                 ], HomeComponent);

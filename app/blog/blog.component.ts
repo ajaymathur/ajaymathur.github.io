@@ -1,13 +1,17 @@
 import {Component, OnInit} from 'angular2/core'
-import {BlogService} from './service/blog.service'
+import {BlogService} from './blog.service'
 @Component({
     template:`
         <h2>Blogs</h2>
-        <div *ngFor="#blog of blogs">
-            <h3>{{blog.heading}}</h3>
-            <p>{{blog.intro}}</p>
-            <p (click)=pullBlog(blog.id)>(read more)</p>
-            
+        <div *ngIf="startProduction">
+            <div *ngFor="#blog of blogs">
+                <h3>{{blog.heading}}</h3>
+                <p>{{blog.intro}}</p>
+                <p (click)=pullBlog(blog.id)>(read more)</p>
+            </div>
+        </div>
+        <div *ngIf="!startProduction">
+            Under Development
         </div>
     `,
     providers:[BlogService]

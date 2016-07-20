@@ -1,4 +1,4 @@
-System.register(['angular2/core', './service/blog.service'], function(exports_1, context_1) {
+System.register(['angular2/core', './blog.service'], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -37,7 +37,7 @@ System.register(['angular2/core', './service/blog.service'], function(exports_1,
                 };
                 BlogComponent = __decorate([
                     core_1.Component({
-                        template: "\n        <h2>Blogs</h2>\n        <div *ngFor=\"#blog of blogs\">\n            <h3>{{blog.heading}}</h3>\n            <p>{{blog.intro}}</p>\n            <p (click)=pullBlog(blog.id)>(read more)</p>\n            \n        </div>\n    ",
+                        template: "\n        <h2>Blogs</h2>\n        <div *ngIf=\"startProduction\">\n            <div *ngFor=\"#blog of blogs\">\n                <h3>{{blog.heading}}</h3>\n                <p>{{blog.intro}}</p>\n                <p (click)=pullBlog(blog.id)>(read more)</p>\n            </div>\n        </div>\n        <div *ngIf=\"!startProduction\">\n            Under Development\n        </div>\n    ",
                         providers: [blog_service_1.BlogService]
                     }), 
                     __metadata('design:paramtypes', [blog_service_1.BlogService])

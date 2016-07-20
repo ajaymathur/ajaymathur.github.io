@@ -1,7 +1,7 @@
 import {Component} from 'angular2/core';
-import {HomeComponent} from './home.component';
-import {BlogComponent} from './blog.component';
-import {ConnectComponent} from './connect.component'
+import {HomeComponent} from './home//home.component';
+import {BlogComponent} from './blog/blog.component';
+import {ConnectComponent} from './connect/connect.component'
 import { RouteConfig, ROUTER_DIRECTIVES, ROUTER_PROVIDERS } from 'angular2/router';
 
 @Component({

@@ -3,9 +3,9 @@ import {HomeService} from './home.service'
 @Component({
     selector: 'courses',
     template: `
-        <h2>Heading in courses</h2>
+        <h1>Heading in courses</h1>
         <div class="search">
-            <input type="search"/>
+            <input id="search-text" type="text" placeholder="Enter Keyword To Search"/>
         </div>
         <div class="course-list">
             <div class="course-list-item" *ngFor="#course of coursesList">

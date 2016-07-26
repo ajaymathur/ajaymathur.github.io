@@ -67,12 +67,15 @@ section#page section#content .main-page{
 	width:100%;
 }
 /* Home component - start*/
-courses h2{
+courses h1{
 	text-align: center;
 	padding: 5px 0;
+	font-size: 3rem;
 }
-courses input[type=search]{
+courses .search #search-text{
 	width: 100%;
+	font-size: 2rem;
+	padding: 5px;
 }
 .course-list{
 	

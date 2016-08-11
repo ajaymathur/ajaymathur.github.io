@@ -8,8 +8,8 @@ import { RouteConfig, ROUTER_DIRECTIVES, ROUTER_PROVIDERS } from 'angular2/route
     selector: 'my-app',
     template: `
     <nav>
-    <img src="assets/userDefined/css/images/logo.jpg"/>
-    <ul><li [routerLink]='["Home"]'>Home</li><li [routerLink]='["Blog"]'>blog</li><li [routerLink]='["ConnectMe"]'>Contact Me</li></ul>
+    <img src="../styles/images/signature.png"/>
+    <ul><li [routerLink]='["ConnectMe"]'>About Ajay</li></ul>
     </nav>
     <section id="page">
         <section id="content">
@@ -23,9 +23,9 @@ import { RouteConfig, ROUTER_DIRECTIVES, ROUTER_PROVIDERS } from 'angular2/route
 })
 
 @RouteConfig([
-    {path: '/home',name:'Home',component:HomeComponent,useAsDefault: true},
+    {path: '/home',name:'Home',component:HomeComponent},
     {path: '/blog',name:'Blog',component:BlogComponent},
-    {path: '/Contact',name:'ConnectMe',component:ConnectComponent}
+    {path: '/Contact',name:'ConnectMe',component:ConnectComponent,useAsDefault: true}
 ])
 
 export class AppComponent { 

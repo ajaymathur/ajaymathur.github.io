@@ -9,7 +9,7 @@ import { RouteConfig, ROUTER_DIRECTIVES, ROUTER_PROVIDERS } from 'angular2/route
     template: `
     <nav>
     <img src="../styles/images/signature.png"/>
-    <ul><li [routerLink]='["ConnectMe"]'>About Ajay</li></ul>
+    <ul><li [routerLink]='["Home"]'>Home</li><li [routerLink]='["ConnectMe"]'>About Ajay</li></ul>
     </nav>
     <section id="page">
         <section id="content">
@@ -23,9 +23,9 @@ import { RouteConfig, ROUTER_DIRECTIVES, ROUTER_PROVIDERS } from 'angular2/route
 })
 
 @RouteConfig([
-    {path: '/home',name:'Home',component:HomeComponent},
+    {path: '/',name:'Home',component:HomeComponent,useAsDefault: true},
     {path: '/blog',name:'Blog',component:BlogComponent},
-    {path: '/Contact',name:'ConnectMe',component:ConnectComponent,useAsDefault: true}
+    {path: '/Contact',name:'ConnectMe',component:ConnectComponent}
 ])
 
 export class AppComponent { 

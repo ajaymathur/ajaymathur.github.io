@@ -73,6 +73,9 @@ section#page section#content .main-page{
 	width:100%;
 }
 /* Home component - start*/
+#home{
+	margin-top: 5px;
+}
 courses h1{
 	text-align: center;
 	padding: 5px 0;
@@ -84,26 +87,38 @@ courses .search #search-text{
 	padding: 5px;
 }
 .course-list{
-	
+	width: 30%;
+	height: calc(100% - 60px);
+	overflow: auto;
+	display: inline-block;
+}
+.course-list:nth-child(2){
+	width: 70%;
 }
 .course-list-item{
-	height: 400px;
-	width: 180px;
 	background: #fff;
+	padding: 20px;
+	box-sizing: border-box;
+}
+.course-list-item.active{
+	box-shadow: 0 0px 20px 9px #ededed inset;
+}
+.course-list-item + .course-list-item{
+	border-top: 1px solid #ededed;
+}
+.course-list-item .course-list-item-image {
+	width: 30%;
 	display: inline-block;
-	margin: 20px;
 }
 .course-list-item .course-list-item-image img{
-	height: 100px;
-	width: 180px;
+	width: 100%;
 }
 .course-list-item .course-list-item-description{
-	height: 290px;
-	width: 170px;
+	width: 50%;
 	padding: 5px;
+	display: inline-block;
 }
 .course-list-item .course-list-item-description div{
-	height: 240px;
 	overflow: hidden;
 }
 .course-list-item .course-list-item-description .course-list-item-description-tags{

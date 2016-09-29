@@ -37,13 +37,13 @@ System.register(['angular2/core', './home//home.component', './blog/blog.compone
                 AppComponent = __decorate([
                     core_1.Component({
                         selector: 'my-app',
-                        template: "\n    <nav>\n    <img src=\"../styles/images/signature.png\"/>\n    <ul><li [routerLink]='[\"ConnectMe\"]'>About Ajay</li></ul>\n    </nav>\n    <section id=\"page\">\n        <section id=\"content\">\n            <section class=\"main-page\">\n                <router-outlet></router-outlet>\n            </section>\n        </section>\n    </section>\n    ",
+                        template: "\n    <nav>\n    <img src=\"../styles/images/signature.png\"/>\n    <ul><li [routerLink]='[\"Home\"]'>Home</li><li [routerLink]='[\"ConnectMe\"]'>About Ajay</li></ul>\n    </nav>\n    <section id=\"page\">\n        <section id=\"content\">\n            <section class=\"main-page\">\n                <router-outlet></router-outlet>\n            </section>\n        </section>\n    </section>\n    ",
                         directives: [router_1.ROUTER_DIRECTIVES],
                     }),
                     router_1.RouteConfig([
-                        { path: '/home', name: 'Home', component: home_component_1.HomeComponent },
+                        { path: '/', name: 'Home', component: home_component_1.HomeComponent, useAsDefault: true },
                         { path: '/blog', name: 'Blog', component: blog_component_1.BlogComponent },
-                        { path: '/Contact', name: 'ConnectMe', component: connect_component_1.ConnectComponent, useAsDefault: true }
+                        { path: '/Contact', name: 'ConnectMe', component: connect_component_1.ConnectComponent }
                     ]), 
                     __metadata('design:paramtypes', [])
                 ], AppComponent);

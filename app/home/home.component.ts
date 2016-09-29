@@ -3,12 +3,9 @@ import {HomeService} from './home.service'
 @Component({
     selector: 'courses',
     template: `
-        <h1>Heading in courses</h1>
-        <div class="search">
-            <input id="search-text" type="text" placeholder="Enter Keyword To Search"/>
-        </div>
+    <div id="home">
         <div class="course-list">
-            <div class="course-list-item" *ngFor="#course of coursesList">
+            <div class="course-list-item" id="id-{{course.id}}" *ngFor="#course of coursesList" (click)="courseClick($event,course.id)">
                 <div class="course-list-item-image">
                     <img src="../../styles/images/home/1.png"/>
                 </div>
@@ -22,19 +19,37 @@ import {HomeService} from './home.service'
                     </div>
                 </div>
             </div>
+        </div><div *ngIf="courseDetail" class="course-list">
+            <h1>{{courseDetail.heading}}</h1>
+            <p>{{courseDetail.description}}</p>
         </div>
+    </div>
     `,
     providers: [HomeService]
 })
 
 export class HomeComponent {
     coursesList: Array<any>;
+    courseListElements: NodeList;
+    courseDetail: Array<any>;
     constructor(private courseService : HomeService){
+        
     }
     ngOnInit() {
         this.getCourses();
     }
     getCourses(){
         this.courseService.getCourses().then(courses => {this.coursesList = courses;});
+    }
+    courseClick(c,d){ 
+        this.courseListElements = document.querySelectorAll("div.course-list-item");
+        Array.prototype.forEach.call(this.courseListElements,function(e){
+            e.className = e.className.replace(" active","");
+        })
+        c.target.className += " active";
+        this.courseService.getCourseDetail(d).then(courseDetail => {
+            console.log(courseDetail);
+            this.courseDetail = courseDetail;
+        });
     }
 }

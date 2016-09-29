@@ -20,6 +20,46 @@ export var coursesList : Array<ICourseList> = [
         heading: "Something trndy",
         hint: "Create cool animations just my using sprite images.",
         tags: ["css","css-animation"],
-        id: 2
+        id: 3
+    },{
+        heading: "Something trndy",
+        hint: "Create cool animations just my using sprite images.",
+        tags: ["css","css-animation"],
+        id: 4
+    },{
+        heading: "Something trndy",
+        hint: "Create cool animations just my using sprite images.",
+        tags: ["css","css-animation"],
+        id: 5
+    },{
+        heading: "Something trndy",
+        hint: "Create cool animations just my using sprite images.",
+        tags: ["css","css-animation"],
+        id: 6
+    },{
+        heading: "Something trndy",
+        hint: "Create cool animations just my using sprite images.",
+        tags: ["css","css-animation"],
+        id: 7
+    },{
+        heading: "Something trndy",
+        hint: "Create cool animations just my using sprite images.",
+        tags: ["css","css-animation"],
+        id: 8
+    },{
+        heading: "Something trndy",
+        hint: "Create cool animations just my using sprite images.",
+        tags: ["css","css-animation"],
+        id: 9
+    },{
+        heading: "Something trndy",
+        hint: "Create cool animations just my using sprite images.",
+        tags: ["css","css-animation"],
+        id: 10
+    },{
+        heading: "Something trndy",
+        hint: "Create cool animations just my using sprite images.",
+        tags: ["css","css-animation"],
+        id: 11
     }
 ]

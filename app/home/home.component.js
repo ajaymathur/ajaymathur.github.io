@@ -32,10 +32,22 @@ System.register(['angular2/core', './home.service'], function(exports_1, context
                     var _this = this;
                     this.courseService.getCourses().then(function (courses) { _this.coursesList = courses; });
                 };
+                HomeComponent.prototype.courseClick = function (c, d) {
+                    var _this = this;
+                    this.courseListElements = document.querySelectorAll("div.course-list-item");
+                    Array.prototype.forEach.call(this.courseListElements, function (e) {
+                        e.className = e.className.replace(" active", "");
+                    });
+                    c.target.className += " active";
+                    this.courseService.getCourseDetail(d).then(function (courseDetail) {
+                        console.log(courseDetail);
+                        _this.courseDetail = courseDetail;
+                    });
+                };
                 HomeComponent = __decorate([
                     core_1.Component({
                         selector: 'courses',
-                        template: "\n        <h1>Heading in courses</h1>\n        <div class=\"search\">\n            <input id=\"search-text\" type=\"text\" placeholder=\"Enter Keyword To Search\"/>\n        </div>\n        <div class=\"course-list\">\n            <div class=\"course-list-item\" *ngFor=\"#course of coursesList\">\n                <div class=\"course-list-item-image\">\n                    <img src=\"../../styles/images/home/1.png\"/>\n                </div>\n                <div class=\"course-list-item-description\">\n                    <h3>{{course.heading}}</h3>\n                    <div>{{course.hint}}</div>\n                    <div class=\"course-list-item-description-tags\">\n                        <ul>\n                            <li *ngFor=\"#tag of course.tags\">{{tag}}</li>\n                        </ul>\n                    </div>\n                </div>\n            </div>\n        </div>\n    ",
+                        template: "\n    <div id=\"home\">\n        <div class=\"course-list\">\n            <div class=\"course-list-item\" id=\"id-{{course.id}}\" *ngFor=\"#course of coursesList\" (click)=\"courseClick($event,course.id)\">\n                <div class=\"course-list-item-image\">\n                    <img src=\"../../styles/images/home/1.png\"/>\n                </div>\n                <div class=\"course-list-item-description\">\n                    <h3>{{course.heading}}</h3>\n                    <div>{{course.hint}}</div>\n                    <div class=\"course-list-item-description-tags\">\n                        <ul>\n                            <li *ngFor=\"#tag of course.tags\">{{tag}}</li>\n                        </ul>\n                    </div>\n                </div>\n            </div>\n        </div><div *ngIf=\"courseDetail\" class=\"course-list\">\n            <h1>{{courseDetail.heading}}</h1>\n            <p>{{courseDetail.description}}</p>\n        </div>\n    </div>\n    ",
                         providers: [home_service_1.HomeService]
                     }), 
                     __metadata('design:paramtypes', [home_service_1.HomeService])

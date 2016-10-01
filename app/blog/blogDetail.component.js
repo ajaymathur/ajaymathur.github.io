@@ -10,26 +10,36 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require('@angular/core');
 var router_1 = require('@angular/router');
+var platform_browser_1 = require('@angular/platform-browser');
 var blog_service_1 = require('./blog.service');
 var BlogDetailComponent = (function () {
-    function BlogDetailComponent(blogService, route) {
+    function BlogDetailComponent(blogService, route, domSanitizer) {
         this.blogService = blogService;
         this.route = route;
+        this.domSanitizer = domSanitizer;
+        this.blog = {
+            description: ""
+        };
     }
     BlogDetailComponent.prototype.ngOnInit = function () {
         var _this = this;
         this.route.params.forEach(function (param) {
             var id = +param['id'];
-            _this.blogService.getBlogWithId(--id).then(function (blog) { return _this.blog = blog; });
+            _this.blogService.getBlogWithId(--id).then(function (blog) {
+                console.log(blog);
+                _this.blog.description = _this.domSanitizer.bypassSecurityTrustHtml(blog.description);
+                _this.blog.heading = blog.heading;
+            });
         });
     };
     BlogDetailComponent = __decorate([
         core_1.Component({
             selector: 'blog-detail',
-            template: "\n        <div *ngIf='blog'>\n            <h1>{{blog.heading}}</h1>\n            <div [innerHTML]='blog.description'></div>\n        </div>",
-            providers: [blog_service_1.BlogService]
+            template: "\n        <div *ngIf='blog'>\n            <h1>{{blog.heading}}</h1>\n             <div [innerHTML]='blog.description'></div>\n        </div>",
+            providers: [blog_service_1.BlogService],
+            styles: ["*{padding: 10px;line-height: 2.3rem}", "p{font-size: 2rem}"]
         }), 
-        __metadata('design:paramtypes', [blog_service_1.BlogService, router_1.ActivatedRoute])
+        __metadata('design:paramtypes', [blog_service_1.BlogService, router_1.ActivatedRoute, platform_browser_1.DomSanitizer])
     ], BlogDetailComponent);
     return BlogDetailComponent;
 }());

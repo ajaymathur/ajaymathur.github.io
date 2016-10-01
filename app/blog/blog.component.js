@@ -15,7 +15,7 @@ var BlogComponent = (function () {
     BlogComponent = __decorate([
         core_1.Component({
             selector: 'my-blog',
-            template: '<router-outlet></router-outlet>'
+            template: '<router-outlet></router-outlet>',
         }), 
         __metadata('design:paramtypes', [])
     ], BlogComponent);

@@ -6,3 +6,10 @@ html,body{
     height: 100%;
     width: 100%;
 }
+p span[keyword]{
+    background: #e4e4e4;
+}
+pre{
+    background: #3c3c3c;
+    color: white;
+}

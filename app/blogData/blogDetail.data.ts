@@ -43,4 +43,69 @@ is used to capture the event and thus execute some functionality.</p>
 </ul>
     `,
     tags: ["angular2"]
+},{
+    id: 2,
+    heading: "angular directives",
+    description: `
+<p><a href='https://docs.angularjs.org/api/ng/service/$compile'>Refrence of the article</a>, There are multiple options for a 
+directive it matters what value we return in factory function. We may return a <span keyword>directive defination object</span>
+which contains the properties that the directive has or just a <span keyword>postLink</span> function and all the properties take
+up the default property.<p>
+<p>Here is an example of directive where we return a <span keyword>directive defination object</span>:</p>
+<pre>
+    <code>
+    var myModule = angular.module(...);
+
+    myModule.directive('directiveName', function factory(injectables) {
+    var directiveDefinitionObject = {
+        priority: 0,
+        template: '&lt;div>&lt;/div>', // or // function(tElement, tAttrs) { ... },
+        // or
+        // templateUrl: 'directive.html', // or // function(tElement, tAttrs) { ... },
+        transclude: false,
+        restrict: 'A',
+        templateNamespace: 'html',
+        scope: false,
+        controller: function($scope, $element, $attrs, $transclude, otherInjectables) { ... },
+        controllerAs: 'stringIdentifier',
+        bindToController: false,
+        require: 'siblingDirectiveName', // or // ['^parentDirectiveName', '?optionalDirectiveName', '?^optionalParent'],
+        multiElement: false,
+        compile: function compile(tElement, tAttrs, transclude) {
+        return {
+            pre: function preLink(scope, iElement, iAttrs, controller) { ... },
+            post: function postLink(scope, iElement, iAttrs, controller) { ... }
+        }
+        // or
+        // return function postLink( ... ) { ... }
+        },
+        // or
+        // link: {
+        //  pre: function preLink(scope, iElement, iAttrs, controller) { ... },
+        //  post: function postLink(scope, iElement, iAttrs, controller) { ... }
+        // }
+        // or
+        // link: function postLink( ... ) { ... }
+    };
+    return directiveDefinitionObject;
+    });
+    </code>
+</pre>
+<p>As mentioned already any unspecified value takes the default, therefore we can create directive just by folowwing:</p>
+<pre>
+    <code>
+    var myModule = angular.module(...);
+
+    myModule.directive('directiveName', function factory(injectables) {
+    var directiveDefinitionObject = {
+        link: function postLink(scope, iElement, iAttrs) { ... }
+    };
+    return directiveDefinitionObject;
+    // or
+    // return function postLink(scope, iElement, iAttrs) { ... }
+    });
+    </code>
+</pre>
+    `,
+    tags: ["angular2"]
 }]

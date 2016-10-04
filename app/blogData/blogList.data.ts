@@ -13,4 +13,8 @@ export var blogList: IBlogList[] = [{
     id: 2,
     heading: "directive",
     tags: ["angular v1","javascript","directive","custom-directive"]
+},{
+    id: 3,
+    heading: "git, up and running",
+    tags: ["git","source control"]
 }]

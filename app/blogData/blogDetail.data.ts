@@ -108,4 +108,49 @@ up the default property.<p>
 </pre>
     `,
     tags: ["angular2"]
+},{
+    id: 3,
+    heading: 'git up and running',
+    description: `
+<p><a href='https://git-scm.com/book/en/v2/Getting-Started-About-Version-Control'>Source of article</a></p>
+<h3>Setting up GIT</h3>
+<p>Indentify git with your information that will be used in every commit</p>
+<pre>
+    <code>
+    $ git config --global user.name "[Your name]"
+    $ git config --global user.email "[Your email address]"
+    </code>
+</pre>
+<p>This informtion will be used by git whenever you login in to system and try to commit anything into git.</p>
+<p>In case you need to set these values for that particular git repository remove <span keyword>global</span> from the command.</p>
+<h3>Check you settings for git</h3>
+<pre>
+    <code>
+    $ git config --list
+    </code>
+</pre>
+<h3>Initialize GIT repository</h3>
+<p>There are two ways to create a GIT project, clone an existing GIT project from another server second is to take import a existing
+project or directory to GIT</p>
+<pre>
+    <code>
+    $ git init
+    </code>
+</pre>
+<p>Once execute the init command it creates a .git subdirectory. But wait the existing files in the directory are not committed to 
+the GIT. Use following command to add and commit your files in direcotry.</p>
+<pre>
+    <code>
+    $ git add .                          <-- This will track all the files in the directory
+    $ git commit -m "Initial commit"     <-- 
+    </code>
+</pre>
+<p>To clone an existing repository from another server run:</p>
+<pre>
+    <code>
+    $ git clone "[url of the project]"
+    </code>
+</pre>
+    `,
+    tags: ["git"]
 }]

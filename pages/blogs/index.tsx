@@ -1,6 +1,19 @@
 import React from 'react';
-import Link from 'next/link';
+import ListItem from '../../components/ListItem';
 
-export default () => <Link href="/blogs/creating_repl">
-    <a>Creating a REPL</a>
-</Link>
+import Page from '../../components/Page';
+import Main from '../../components/Main';
+
+function Blogs() {
+	return <Page>
+		<Main>
+			<ListItem
+				link='/blogs/creating_repl'
+				heading="Creating a REPL"
+				shortDescription="how to create a repl"
+			/>
+		</Main>
+	</Page>
+}
+
+export default Blogs;

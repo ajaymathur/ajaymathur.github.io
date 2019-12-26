@@ -1,0 +1,9 @@
+.list-item {
+  border: 1px solid #cdcdcd;
+  border-radius: 7px;
+  margin-bottom: 15px;
+  padding: 5px 30px;
+  &:hover {
+  box-shadow: 0px 0px 15px 0px #cdcdcd;
+}
+}

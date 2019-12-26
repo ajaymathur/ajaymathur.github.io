@@ -2,7 +2,7 @@
   display: flex;
   width: 100%;
   justify-content: center;
-  div {
+  > div {
     text-align: left;
     width: 60%;
     a {

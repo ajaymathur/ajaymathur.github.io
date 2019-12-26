@@ -4,10 +4,9 @@ nav {
 		justify-content: flex-end;
 		a {
 			text-decoration: none;
-      + a::before {
+			padding: 0 20px;
+      + .seperator {
         color: #dddddd;
-        content: '|';
-        margin: 0 20px;
       }
 		}
 	}

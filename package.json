@@ -19,6 +19,7 @@
     "dev": "next",
     "build": "next build",
     "start": "next start",
+    "export": "next export",
     "prettier": "prettier **/*.{tsx,scss,mdx} --write"
   },
   "devDependencies": {

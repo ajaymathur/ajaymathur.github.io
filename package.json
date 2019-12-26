@@ -1,0 +1,31 @@
+{
+  "name": "ajaymathur.github.io",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:ajaymathur/ajaymathur.github.io.git",
+  "author": "Ajay Narain Mathur <ajaynarainmathur@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@mdx-js/loader": "^1.5.3",
+    "@next/mdx": "^9.1.6",
+    "@zeit/next-sass": "^1.0.1",
+    "next": "^9.1.1",
+    "node-sass": "^4.13.0",
+    "react": "^16.11.0",
+    "react-dom": "^16.11.0",
+    "react-markdown": "^4.2.2"
+  },
+  "scripts": {
+    "dev": "next",
+    "build": "next build",
+    "start": "next start",
+    "prettier": "prettier **/*.{tsx,scss,mdx} --write"
+  },
+  "devDependencies": {
+    "@types/node": "^12.11.7",
+    "@types/react": "^16.9.11",
+    "prettier": "^1.19.1",
+    "raw-loader": "^4.0.0",
+    "typescript": "^3.6.4"
+  }
+}

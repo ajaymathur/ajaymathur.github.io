@@ -1,0 +1,13 @@
+nav {
+		padding: 50px;
+		display: flex;
+		justify-content: flex-end;
+		a {
+			text-decoration: none;
+      + a::before {
+        color: #dddddd;
+        content: '|';
+        margin: 0 20px;
+      }
+		}
+	}

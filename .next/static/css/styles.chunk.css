@@ -1,0 +1,57 @@
+nav {
+  padding: 50px;
+  display: flex;
+  justify-content: flex-end; }
+  nav a {
+    text-decoration: none; }
+    nav a + a::before {
+      color: #dddddd;
+      content: '|';
+      margin: 0 20px; }
+
+* {
+  box-sizing: border-box;
+  font-size: 1.2rem;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #4a4a4a; }
+
+html {
+  height: 100%; }
+  html body {
+    height: 100%;
+    margin: 0; }
+    html body #__next {
+      height: 100%; }
+
+#homepage {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden; }
+  #homepage main {
+    height: 50%;
+    width: 100%; }
+    #homepage main header {
+      padding: 0 50px; }
+      #homepage main header h1 {
+        font-size: 3rem;
+        font-weight: normal; }
+  #homepage #styling {
+    background: url(/star-background.png);
+    height: 50%;
+    width: 100%; }
+    #homepage #styling svg {
+      height: 100%; }
+
+#links {
+  display: flex;
+  width: 100%;
+  justify-content: center; }
+  #links div {
+    text-align: left;
+    width: 60%; }
+    #links div a {
+      text-decoration: none; }
+
+
+/*# sourceMappingURL=styles.chunk.css.map*/

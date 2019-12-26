@@ -1,0 +1,12 @@
+#links {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  div {
+    text-align: left;
+    width: 60%;
+    a {
+      text-decoration: none;
+    }
+  }
+}

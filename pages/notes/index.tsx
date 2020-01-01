@@ -6,15 +6,23 @@ import Page from '../../components/Page';
 function Notes() {
 	return <Page>
 		<Main>
+			<h2>Javascript</h2>
 			<ListItem
-				link='/notes/javascript'
-				heading="Javascript"
-				shortDescription="My Js Notes"
+				link='/notes/javascript/pipe-operator'
+				heading="Pipe Operator"
+				shortDescription="Details of pipe operator"
 			/>
+			<h2>TypeScript</h2>
 			<ListItem
-				link='/notes/typescript'
-				heading="TypeScript"
-				shortDescription="My Ts Notes"
+				link='/notes/typescript/decorators'
+				heading="Decorators"
+				shortDescription="About decorators"
+			/>
+			<h2>Unix</h2>
+			<ListItem
+				link='/notes/unix/sed'
+				heading="sed ( Stream editor )"
+				shortDescription="About sed"
 			/>
 		</Main>
 	</Page>

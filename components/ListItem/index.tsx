@@ -8,7 +8,7 @@ function ListItem({ heading, shortDescription, link }) {
     <Link href={link}>
       <a>
         <div className="list-item">
-          <h2>{heading}</h2>
+          <h3>{heading}</h3>
           <p>{shortDescription}</p>
         </div>
       </a>

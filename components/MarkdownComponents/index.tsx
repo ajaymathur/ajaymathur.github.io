@@ -1,14 +1,18 @@
 import React from 'react';
+import { MDXProvider } from '@mdx-js/react';
 
 const codeStyle = {
-  'background-color': '#dddddd',
+  'backgroundColor': '#dddddd',
   'padding': '2px 5px',
   'color': '#565656',
-  'border-radius': '5px',
+  'borderRadius': '5px',
 }
 
-export default {
+const components = {
   pre: props => <pre {...props} />,
   code: props => <code {...props} style={codeStyle} />,
   inlineCode: props => <code {...props} style={codeStyle} />
 }
+export default ({ children }) => <MDXProvider components={components}>
+  {children}
+</MDXProvider>;

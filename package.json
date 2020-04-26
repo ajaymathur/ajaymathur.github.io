@@ -9,6 +9,7 @@
     "@mdx-js/loader": "^1.5.3",
     "@next/mdx": "^9.1.6",
     "@zeit/next-sass": "^1.0.1",
+    "gh-pages": "^2.2.0",
     "next": "^9.1.1",
     "node-sass": "^4.13.0",
     "react": "^16.11.0",
@@ -17,10 +18,12 @@
   },
   "scripts": {
     "dev": "next",
-    "build": "next build",
+    "build": "next export",
     "start": "next start",
     "export": "next export",
-    "prettier": "prettier **/*.{tsx,scss,mdx} --write"
+    "prettier": "prettier **/*.{tsx,scss,mdx} --write",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -b master -d out"
   },
   "devDependencies": {
     "@types/node": "^12.11.7",

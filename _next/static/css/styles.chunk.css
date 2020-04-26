@@ -1,0 +1,62 @@
+.list-item {
+  border: 1px solid #cdcdcd;
+  border-radius: 7px;
+  margin-bottom: 15px;
+  padding: 5px 30px; }
+  .list-item:hover {
+    box-shadow: 0px 0px 15px 0px #cdcdcd; }
+
+nav {
+  padding: 50px;
+  display: flex;
+  justify-content: flex-end; }
+  nav a {
+    text-decoration: none;
+    padding: 0 20px; }
+    nav a + .seperator {
+      color: #dddddd; }
+
+* {
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #4a4a4a; }
+
+html {
+  height: 100%; }
+  html body {
+    height: 100%;
+    margin: 0; }
+    html body #__next {
+      height: 100%; }
+
+#homepage {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden; }
+  #homepage #banner {
+    height: 50%;
+    width: 100%; }
+    #homepage #banner header {
+      padding: 0 50px; }
+      #homepage #banner header h1 {
+        font-size: 3rem;
+        font-weight: normal; }
+  #homepage #styling {
+    background: url(/star-background.png);
+    height: 50%;
+    width: 100%; }
+    #homepage #styling svg {
+      height: 100%; }
+
+#page {
+  display: flex;
+  flex-direction: column;
+  width: 100%; }
+
+main {
+  align-self: center;
+  width: 60%; }
+
+
+/*# sourceMappingURL=styles.chunk.css.map*/

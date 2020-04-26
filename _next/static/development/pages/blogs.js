@@ -11330,7 +11330,7 @@ function Blogs() {
 
 /***/ }),
 
-/***/ 9:
+/***/ 8:
 /*!*********************************************************************************************************************************************************************!*\
   !*** multi next-client-pages-loader?page=%2Fblogs&absolutePagePath=%2FUsers%2Famathur%2Fworkspace%2Fopen-source%2Fajaymathur.github.io%2Fpages%2Fblogs%2Findex.tsx ***!
   \*********************************************************************************************************************************************************************/
@@ -11353,5 +11353,5 @@ module.exports = dll_e9ad7d891b372a4221cf;
 
 /***/ })
 
-},[[9,"static/runtime/webpack.js","styles"]]]);
+},[[8,"static/runtime/webpack.js","styles"]]]);
 //# sourceMappingURL=blogs.js.map

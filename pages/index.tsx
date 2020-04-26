@@ -10,7 +10,7 @@ export default () => (
       <Nav />
       <header>
         <h1>Ajay Narain Mathur</h1>
-        <p>Programming, Reading and Cooking</p>
+        <p>Programming & Reading</p>
       </header>
     </div>
     <div id="styling">

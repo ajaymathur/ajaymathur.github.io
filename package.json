@@ -18,12 +18,11 @@
   },
   "scripts": {
     "dev": "next",
-    "build": "next export",
+    "build": "next build && next export",
     "start": "next start",
     "export": "next export",
     "prettier": "prettier **/*.{tsx,scss,mdx} --write",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -b master -d out"
+    "deploy": "next build && next export && touch out/.nojekyll && gh-pages -b master -d out"
   },
   "devDependencies": {
     "@types/node": "^12.11.7",

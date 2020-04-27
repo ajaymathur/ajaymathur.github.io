@@ -1,3 +1,27 @@
+.mobile-nav {
+	font-size: 3rem;
+	.hamburger-icon {
+		padding: 5px;
+	}
+	nav {
+		background-color: black;
+		display: block;
+		height: 100vh;
+		padding-left: 0;
+		position: fixed;
+		transition: transform .3s linear;
+		width: 100vw;
+		&.menu-closed {
+			transform: translateX(-100%);
+		}
+		a {
+			display: block;
+			font-size: 1.5rem;
+			line-height: 2;
+		}
+	}
+}
+
 nav {
 		padding: 50px;
 		display: flex;

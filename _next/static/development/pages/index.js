@@ -1,114 +1,4 @@
-(window["webpackJsonp"] = window["webpackJsonp"] || []).push([["static/development/pages/notes.js"],{
-
-/***/ "./components/ListItem/index.tsx":
-/*!***************************************!*\
-  !*** ./components/ListItem/index.tsx ***!
-  \***************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var next_link__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! next/link */ "./node_modules/next/link.js");
-/* harmony import */ var next_link__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(next_link__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _styles_scss__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./styles.scss */ "./components/ListItem/styles.scss");
-/* harmony import */ var _styles_scss__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_styles_scss__WEBPACK_IMPORTED_MODULE_2__);
-var _jsxFileName = "/Users/amathur/workspace/open-source/ajaymathur.github.io/components/ListItem/index.tsx";
-var __jsx = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement;
-
-
-
-
-function ListItem(_ref) {
-  var heading = _ref.heading,
-      shortDescription = _ref.shortDescription,
-      link = _ref.link;
-  return __jsx(react__WEBPACK_IMPORTED_MODULE_0__["Fragment"], {
-    __self: this,
-    __source: {
-      fileName: _jsxFileName,
-      lineNumber: 7,
-      columnNumber: 10
-    }
-  }, __jsx(next_link__WEBPACK_IMPORTED_MODULE_1___default.a, {
-    href: link,
-    __self: this,
-    __source: {
-      fileName: _jsxFileName,
-      lineNumber: 8,
-      columnNumber: 5
-    }
-  }, __jsx("a", {
-    __self: this,
-    __source: {
-      fileName: _jsxFileName,
-      lineNumber: 9,
-      columnNumber: 7
-    }
-  }, __jsx("div", {
-    className: "list-item",
-    __self: this,
-    __source: {
-      fileName: _jsxFileName,
-      lineNumber: 10,
-      columnNumber: 9
-    }
-  }, __jsx("h3", {
-    __self: this,
-    __source: {
-      fileName: _jsxFileName,
-      lineNumber: 11,
-      columnNumber: 11
-    }
-  }, heading), __jsx("p", {
-    __self: this,
-    __source: {
-      fileName: _jsxFileName,
-      lineNumber: 12,
-      columnNumber: 11
-    }
-  }, shortDescription)))));
-}
-
-/* harmony default export */ __webpack_exports__["default"] = (ListItem);
-
-/***/ }),
-
-/***/ "./components/Main/index.tsx":
-/*!***********************************!*\
-  !*** ./components/Main/index.tsx ***!
-  \***********************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _styles_scss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./styles.scss */ "./components/Main/styles.scss");
-/* harmony import */ var _styles_scss__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_styles_scss__WEBPACK_IMPORTED_MODULE_1__);
-var _jsxFileName = "/Users/amathur/workspace/open-source/ajaymathur.github.io/components/Main/index.tsx";
-var __jsx = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement;
-
-
-
-function Main(_ref) {
-  var children = _ref.children;
-  return __jsx("main", {
-    __self: this,
-    __source: {
-      fileName: _jsxFileName,
-      lineNumber: 5,
-      columnNumber: 10
-    }
-  }, children);
-}
-
-/* harmony default export */ __webpack_exports__["default"] = (Main);
-
-/***/ }),
+(window["webpackJsonp"] = window["webpackJsonp"] || []).push([["static/development/pages/index.js"],{
 
 /***/ "./components/Meta/index.tsx":
 /*!***********************************!*\
@@ -459,66 +349,6 @@ function Nav() {
 }
 
 /* harmony default export */ __webpack_exports__["default"] = (Nav);
-
-/***/ }),
-
-/***/ "./components/Page/index.tsx":
-/*!***********************************!*\
-  !*** ./components/Page/index.tsx ***!
-  \***********************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Meta__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Meta */ "./components/Meta/index.tsx");
-/* harmony import */ var _Nav__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../Nav */ "./components/Nav/index.tsx");
-/* harmony import */ var _styles_scss__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./styles.scss */ "./components/Page/styles.scss");
-/* harmony import */ var _styles_scss__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_styles_scss__WEBPACK_IMPORTED_MODULE_3__);
-var _jsxFileName = "/Users/amathur/workspace/open-source/ajaymathur.github.io/components/Page/index.tsx";
-var __jsx = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement;
-
-
-
-
-
-function Page(_ref) {
-  var children = _ref.children;
-  return __jsx(react__WEBPACK_IMPORTED_MODULE_0__["Fragment"], {
-    __self: this,
-    __source: {
-      fileName: _jsxFileName,
-      lineNumber: 7,
-      columnNumber: 10
-    }
-  }, __jsx(_Meta__WEBPACK_IMPORTED_MODULE_1__["default"], {
-    __self: this,
-    __source: {
-      fileName: _jsxFileName,
-      lineNumber: 8,
-      columnNumber: 5
-    }
-  }), __jsx(_Nav__WEBPACK_IMPORTED_MODULE_2__["default"], {
-    __self: this,
-    __source: {
-      fileName: _jsxFileName,
-      lineNumber: 9,
-      columnNumber: 5
-    }
-  }), __jsx("div", {
-    id: "page",
-    __self: this,
-    __source: {
-      fileName: _jsxFileName,
-      lineNumber: 10,
-      columnNumber: 5
-    }
-  }, children));
-}
-
-/* harmony default export */ __webpack_exports__["default"] = (Page);
 
 /***/ }),
 
@@ -7230,21 +7060,21 @@ var assign=Object.assign.bind(Object);function g(){return assign;}Object.defineP
 
 /***/ }),
 
-/***/ "./node_modules/next/dist/build/webpack/loaders/next-client-pages-loader.js?page=%2Fnotes&absolutePagePath=%2FUsers%2Famathur%2Fworkspace%2Fopen-source%2Fajaymathur.github.io%2Fpages%2Fnotes%2Findex.tsx!./":
-/*!*****************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/next/dist/build/webpack/loaders/next-client-pages-loader.js?page=%2Fnotes&absolutePagePath=%2FUsers%2Famathur%2Fworkspace%2Fopen-source%2Fajaymathur.github.io%2Fpages%2Fnotes%2Findex.tsx ***!
-  \*****************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/next/dist/build/webpack/loaders/next-client-pages-loader.js?page=%2F&absolutePagePath=%2FUsers%2Famathur%2Fworkspace%2Fopen-source%2Fajaymathur.github.io%2Fpages%2Findex.tsx!./":
+/*!****************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/next/dist/build/webpack/loaders/next-client-pages-loader.js?page=%2F&absolutePagePath=%2FUsers%2Famathur%2Fworkspace%2Fopen-source%2Fajaymathur.github.io%2Fpages%2Findex.tsx ***!
+  \****************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 
-    (window.__NEXT_P=window.__NEXT_P||[]).push(["/notes", function() {
-      var mod = __webpack_require__(/*! ./pages/notes/index.tsx */ "./pages/notes/index.tsx")
+    (window.__NEXT_P=window.__NEXT_P||[]).push(["/", function() {
+      var mod = __webpack_require__(/*! ./pages/index.tsx */ "./pages/index.tsx")
       if(true) {
-        module.hot.accept(/*! ./pages/notes/index.tsx */ "./pages/notes/index.tsx", function() {
-          if(!next.router.components["/notes"]) return
-          var updatedPage = __webpack_require__(/*! ./pages/notes/index.tsx */ "./pages/notes/index.tsx")
-          next.router.update("/notes", updatedPage)
+        module.hot.accept(/*! ./pages/index.tsx */ "./pages/index.tsx", function() {
+          if(!next.router.components["/"]) return
+          var updatedPage = __webpack_require__(/*! ./pages/index.tsx */ "./pages/index.tsx")
+          next.router.update("/", updatedPage)
         })
       }
       return mod
@@ -12110,10 +11940,10 @@ function warning(condition, message) {
 
 /***/ }),
 
-/***/ "./pages/notes/index.tsx":
-/*!*******************************!*\
-  !*** ./pages/notes/index.tsx ***!
-  \*******************************/
+/***/ "./pages/index.tsx":
+/*!*************************!*\
+  !*** ./pages/index.tsx ***!
+  \*************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -12121,97 +11951,109 @@ function warning(condition, message) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _components_ListItem__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../components/ListItem */ "./components/ListItem/index.tsx");
-/* harmony import */ var _components_Main__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../components/Main */ "./components/Main/index.tsx");
-/* harmony import */ var _components_Page__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../components/Page */ "./components/Page/index.tsx");
-var _jsxFileName = "/Users/amathur/workspace/open-source/ajaymathur.github.io/pages/notes/index.tsx";
+/* harmony import */ var _components_Nav__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../components/Nav */ "./components/Nav/index.tsx");
+/* harmony import */ var _components_Meta__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../components/Meta */ "./components/Meta/index.tsx");
+/* harmony import */ var _styles_scss__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./styles.scss */ "./pages/styles.scss");
+/* harmony import */ var _styles_scss__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_styles_scss__WEBPACK_IMPORTED_MODULE_3__);
+var _this = undefined,
+    _jsxFileName = "/Users/amathur/workspace/open-source/ajaymathur.github.io/pages/index.tsx";
+
 var __jsx = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement;
 
 
 
 
-
-function Notes() {
-  return __jsx(_components_Page__WEBPACK_IMPORTED_MODULE_3__["default"], {
-    __self: this,
+/* harmony default export */ __webpack_exports__["default"] = (function () {
+  return __jsx("div", {
+    id: "homepage",
+    __self: _this,
     __source: {
       fileName: _jsxFileName,
       lineNumber: 7,
-      columnNumber: 9
+      columnNumber: 3
     }
-  }, __jsx(_components_Main__WEBPACK_IMPORTED_MODULE_2__["default"], {
-    __self: this,
+  }, __jsx(_components_Meta__WEBPACK_IMPORTED_MODULE_2__["default"], {
+    __self: _this,
     __source: {
       fileName: _jsxFileName,
       lineNumber: 8,
-      columnNumber: 3
+      columnNumber: 5
     }
-  }, __jsx("h2", {
-    __self: this,
+  }), __jsx("div", {
+    id: "banner",
+    __self: _this,
     __source: {
       fileName: _jsxFileName,
       lineNumber: 9,
-      columnNumber: 4
+      columnNumber: 5
     }
-  }, "Javascript"), __jsx(_components_ListItem__WEBPACK_IMPORTED_MODULE_1__["default"], {
-    link: "/notes/javascript/pipe-operator",
-    heading: "Pipe Operator",
-    shortDescription: "Details of pipe operator",
-    __self: this,
+  }, __jsx(_components_Nav__WEBPACK_IMPORTED_MODULE_1__["default"], {
+    __self: _this,
     __source: {
       fileName: _jsxFileName,
       lineNumber: 10,
-      columnNumber: 4
+      columnNumber: 7
     }
-  }), __jsx("h2", {
-    __self: this,
+  }), __jsx("header", {
+    __self: _this,
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 15,
-      columnNumber: 4
+      lineNumber: 11,
+      columnNumber: 7
     }
-  }, "TypeScript"), __jsx(_components_ListItem__WEBPACK_IMPORTED_MODULE_1__["default"], {
-    link: "/notes/typescript/decorators",
-    heading: "Decorators",
-    shortDescription: "About decorators",
-    __self: this,
+  }, __jsx("h1", {
+    __self: _this,
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 12,
+      columnNumber: 9
+    }
+  }, "Ajay Narain Mathur"), __jsx("p", {
+    __self: _this,
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 13,
+      columnNumber: 9
+    }
+  }, "Programming & Reading"))), __jsx("div", {
+    id: "styling",
+    __self: _this,
     __source: {
       fileName: _jsxFileName,
       lineNumber: 16,
-      columnNumber: 4
+      columnNumber: 5
     }
-  }), __jsx("h2", {
-    __self: this,
+  }, __jsx("svg", {
+    viewBox: "0 0 200 100",
+    xmlns: "http://www.w3.org/2000/svg",
+    __self: _this,
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 21,
-      columnNumber: 4
+      lineNumber: 17,
+      columnNumber: 7
     }
-  }, "Unix"), __jsx(_components_ListItem__WEBPACK_IMPORTED_MODULE_1__["default"], {
-    link: "/notes/unix/sed",
-    heading: "sed ( Stream editor )",
-    shortDescription: "About sed",
-    __self: this,
+  }, __jsx("polyline", {
+    points: "0 20, 20 0, 200 100, 0 100, 0",
+    fill: "#5855FF",
+    __self: _this,
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 22,
-      columnNumber: 4
+      lineNumber: 18,
+      columnNumber: 9
     }
-  })));
-}
-
-/* harmony default export */ __webpack_exports__["default"] = (Notes);
+  }))));
+});
 
 /***/ }),
 
-/***/ 1:
-/*!*********************************************************************************************************************************************************************!*\
-  !*** multi next-client-pages-loader?page=%2Fnotes&absolutePagePath=%2FUsers%2Famathur%2Fworkspace%2Fopen-source%2Fajaymathur.github.io%2Fpages%2Fnotes%2Findex.tsx ***!
-  \*********************************************************************************************************************************************************************/
+/***/ 2:
+/*!********************************************************************************************************************************************************!*\
+  !*** multi next-client-pages-loader?page=%2F&absolutePagePath=%2FUsers%2Famathur%2Fworkspace%2Fopen-source%2Fajaymathur.github.io%2Fpages%2Findex.tsx ***!
+  \********************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! next-client-pages-loader?page=%2Fnotes&absolutePagePath=%2FUsers%2Famathur%2Fworkspace%2Fopen-source%2Fajaymathur.github.io%2Fpages%2Fnotes%2Findex.tsx! */"./node_modules/next/dist/build/webpack/loaders/next-client-pages-loader.js?page=%2Fnotes&absolutePagePath=%2FUsers%2Famathur%2Fworkspace%2Fopen-source%2Fajaymathur.github.io%2Fpages%2Fnotes%2Findex.tsx!./");
+module.exports = __webpack_require__(/*! next-client-pages-loader?page=%2F&absolutePagePath=%2FUsers%2Famathur%2Fworkspace%2Fopen-source%2Fajaymathur.github.io%2Fpages%2Findex.tsx! */"./node_modules/next/dist/build/webpack/loaders/next-client-pages-loader.js?page=%2F&absolutePagePath=%2FUsers%2Famathur%2Fworkspace%2Fopen-source%2Fajaymathur.github.io%2Fpages%2Findex.tsx!./");
 
 
 /***/ }),
@@ -12227,5 +12069,5 @@ module.exports = dll_2adc2403d89adc16ead0;
 
 /***/ })
 
-},[[1,"static/runtime/webpack.js","styles"]]]);
-//# sourceMappingURL=notes.js.map
+},[[2,"static/runtime/webpack.js","styles"]]]);
+//# sourceMappingURL=index.js.map

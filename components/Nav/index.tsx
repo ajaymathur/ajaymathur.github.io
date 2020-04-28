@@ -32,6 +32,11 @@ function MobileNav() {
 	return <div className="mobile-nav">
 		<div className="hamburger-icon" onClick={() => toggleMenuState(!isMenuOpen)}>🍔</div>
 		<nav className={`${isMenuOpen ? 'menu-open' : 'menu-closed'}`}>
+			<div className="close-menu">
+				<button onClick={() => toggleMenuState(false)}>
+					ｘ
+				</button>
+			</div>
 			<Link href="/">
 				<a>🏡 Home</a>
 			</Link>

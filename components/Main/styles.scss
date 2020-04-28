@@ -2,3 +2,8 @@ main {
   align-self: center;
   width: 60%;
 }
+@media only screen and (max-device-width: 480px) {
+  main {
+    width: 80%;
+  }
+}

@@ -4,20 +4,33 @@
 		padding: 5px;
 	}
 	nav {
-		background-color: black;
+		background-color: rgb(88, 85, 255);
 		display: block;
 		height: 100vh;
-		padding-left: 0;
+		padding: 0;
 		position: fixed;
-		transition: transform .3s linear;
+		top: 0;
+		transition: transform .3s cubic-bezier(.33,.65,.81,.7);
 		width: 100vw;
 		&.menu-closed {
 			transform: translateX(-100%);
 		}
+		.close-menu {
+			text-align: right;
+			button {
+				color: white;
+				font-size: 3rem;
+			}
+		}
 		a {
+			color: white;
 			display: block;
+			margin: 0 20px;
 			font-size: 1.5rem;
-			line-height: 2;
+			line-height: 3;
+			+ a {
+				border-top: 1px solid white;
+			}
 		}
 	}
 }

@@ -6,14 +6,6 @@
   .list-item:hover {
     box-shadow: 0px 0px 15px 0px #cdcdcd; }
 
-main {
-  align-self: center;
-  width: 60%; }
-
-@media only screen and (max-device-width: 480px) {
-  main {
-    width: 80%; } }
-
 * {
   box-sizing: border-box;
   font-family: Arial, Helvetica, sans-serif;
@@ -66,11 +58,6 @@ nav {
     nav a + .seperator {
       color: #dddddd; }
 
-#page {
-  display: flex;
-  flex-direction: column;
-  width: 100%; }
-
 #homepage {
   display: flex;
   flex-direction: column;
@@ -90,6 +77,19 @@ nav {
     width: 100%; }
     #homepage #styling svg {
       height: 100%; }
+
+#page {
+  display: flex;
+  flex-direction: column;
+  width: 100%; }
+
+main {
+  align-self: center;
+  width: 60%; }
+
+@media only screen and (max-device-width: 480px) {
+  main {
+    width: 80%; } }
 
 
 /*# sourceMappingURL=styles.chunk.css.map*/

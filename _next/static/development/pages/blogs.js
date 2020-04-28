@@ -1,4 +1,4 @@
-(window["webpackJsonp"] = window["webpackJsonp"] || []).push([["static/development/pages/notes.js"],{
+(window["webpackJsonp"] = window["webpackJsonp"] || []).push([["static/development/pages/blogs.js"],{
 
 /***/ "./components/ListItem/index.tsx":
 /*!***************************************!*\
@@ -7230,21 +7230,21 @@ var assign=Object.assign.bind(Object);function g(){return assign;}Object.defineP
 
 /***/ }),
 
-/***/ "./node_modules/next/dist/build/webpack/loaders/next-client-pages-loader.js?page=%2Fnotes&absolutePagePath=%2FUsers%2Famathur%2Fworkspace%2Fopen-source%2Fajaymathur.github.io%2Fpages%2Fnotes%2Findex.tsx!./":
+/***/ "./node_modules/next/dist/build/webpack/loaders/next-client-pages-loader.js?page=%2Fblogs&absolutePagePath=%2FUsers%2Famathur%2Fworkspace%2Fopen-source%2Fajaymathur.github.io%2Fpages%2Fblogs%2Findex.tsx!./":
 /*!*****************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/next/dist/build/webpack/loaders/next-client-pages-loader.js?page=%2Fnotes&absolutePagePath=%2FUsers%2Famathur%2Fworkspace%2Fopen-source%2Fajaymathur.github.io%2Fpages%2Fnotes%2Findex.tsx ***!
+  !*** ./node_modules/next/dist/build/webpack/loaders/next-client-pages-loader.js?page=%2Fblogs&absolutePagePath=%2FUsers%2Famathur%2Fworkspace%2Fopen-source%2Fajaymathur.github.io%2Fpages%2Fblogs%2Findex.tsx ***!
   \*****************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 
-    (window.__NEXT_P=window.__NEXT_P||[]).push(["/notes", function() {
-      var mod = __webpack_require__(/*! ./pages/notes/index.tsx */ "./pages/notes/index.tsx")
+    (window.__NEXT_P=window.__NEXT_P||[]).push(["/blogs", function() {
+      var mod = __webpack_require__(/*! ./pages/blogs/index.tsx */ "./pages/blogs/index.tsx")
       if(true) {
-        module.hot.accept(/*! ./pages/notes/index.tsx */ "./pages/notes/index.tsx", function() {
-          if(!next.router.components["/notes"]) return
-          var updatedPage = __webpack_require__(/*! ./pages/notes/index.tsx */ "./pages/notes/index.tsx")
-          next.router.update("/notes", updatedPage)
+        module.hot.accept(/*! ./pages/blogs/index.tsx */ "./pages/blogs/index.tsx", function() {
+          if(!next.router.components["/blogs"]) return
+          var updatedPage = __webpack_require__(/*! ./pages/blogs/index.tsx */ "./pages/blogs/index.tsx")
+          next.router.update("/blogs", updatedPage)
         })
       }
       return mod
@@ -12110,9 +12110,9 @@ function warning(condition, message) {
 
 /***/ }),
 
-/***/ "./pages/notes/index.tsx":
+/***/ "./pages/blogs/index.tsx":
 /*!*******************************!*\
-  !*** ./pages/notes/index.tsx ***!
+  !*** ./pages/blogs/index.tsx ***!
   \*******************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -12122,96 +12122,55 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _components_ListItem__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../components/ListItem */ "./components/ListItem/index.tsx");
-/* harmony import */ var _components_Main__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../components/Main */ "./components/Main/index.tsx");
-/* harmony import */ var _components_Page__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../components/Page */ "./components/Page/index.tsx");
-var _jsxFileName = "/Users/amathur/workspace/open-source/ajaymathur.github.io/pages/notes/index.tsx";
+/* harmony import */ var _components_Page__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../components/Page */ "./components/Page/index.tsx");
+/* harmony import */ var _components_Main__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../components/Main */ "./components/Main/index.tsx");
+var _jsxFileName = "/Users/amathur/workspace/open-source/ajaymathur.github.io/pages/blogs/index.tsx";
 var __jsx = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement;
 
 
 
 
 
-function Notes() {
-  return __jsx(_components_Page__WEBPACK_IMPORTED_MODULE_3__["default"], {
-    __self: this,
-    __source: {
-      fileName: _jsxFileName,
-      lineNumber: 7,
-      columnNumber: 9
-    }
-  }, __jsx(_components_Main__WEBPACK_IMPORTED_MODULE_2__["default"], {
+function Blogs() {
+  return __jsx(_components_Page__WEBPACK_IMPORTED_MODULE_2__["default"], {
     __self: this,
     __source: {
       fileName: _jsxFileName,
       lineNumber: 8,
-      columnNumber: 3
+      columnNumber: 9
     }
-  }, __jsx("h2", {
+  }, __jsx(_components_Main__WEBPACK_IMPORTED_MODULE_3__["default"], {
     __self: this,
     __source: {
       fileName: _jsxFileName,
       lineNumber: 9,
-      columnNumber: 4
+      columnNumber: 3
     }
-  }, "Javascript"), __jsx(_components_ListItem__WEBPACK_IMPORTED_MODULE_1__["default"], {
-    link: "/notes/javascript/pipe-operator",
-    heading: "Pipe Operator",
-    shortDescription: "Details of pipe operator",
+  }, __jsx(_components_ListItem__WEBPACK_IMPORTED_MODULE_1__["default"], {
+    link: "/blogs/creating_repl",
+    heading: "Creating a REPL",
+    shortDescription: "how to create a repl",
     __self: this,
     __source: {
       fileName: _jsxFileName,
       lineNumber: 10,
       columnNumber: 4
     }
-  }), __jsx("h2", {
-    __self: this,
-    __source: {
-      fileName: _jsxFileName,
-      lineNumber: 15,
-      columnNumber: 4
-    }
-  }, "TypeScript"), __jsx(_components_ListItem__WEBPACK_IMPORTED_MODULE_1__["default"], {
-    link: "/notes/typescript/decorators",
-    heading: "Decorators",
-    shortDescription: "About decorators",
-    __self: this,
-    __source: {
-      fileName: _jsxFileName,
-      lineNumber: 16,
-      columnNumber: 4
-    }
-  }), __jsx("h2", {
-    __self: this,
-    __source: {
-      fileName: _jsxFileName,
-      lineNumber: 21,
-      columnNumber: 4
-    }
-  }, "Unix"), __jsx(_components_ListItem__WEBPACK_IMPORTED_MODULE_1__["default"], {
-    link: "/notes/unix/sed",
-    heading: "sed ( Stream editor )",
-    shortDescription: "About sed",
-    __self: this,
-    __source: {
-      fileName: _jsxFileName,
-      lineNumber: 22,
-      columnNumber: 4
-    }
   })));
 }
 
-/* harmony default export */ __webpack_exports__["default"] = (Notes);
+/* harmony default export */ __webpack_exports__["default"] = (Blogs);
 
 /***/ }),
 
-/***/ 6:
+/***/ 10:
 /*!*********************************************************************************************************************************************************************!*\
-  !*** multi next-client-pages-loader?page=%2Fnotes&absolutePagePath=%2FUsers%2Famathur%2Fworkspace%2Fopen-source%2Fajaymathur.github.io%2Fpages%2Fnotes%2Findex.tsx ***!
+  !*** multi next-client-pages-loader?page=%2Fblogs&absolutePagePath=%2FUsers%2Famathur%2Fworkspace%2Fopen-source%2Fajaymathur.github.io%2Fpages%2Fblogs%2Findex.tsx ***!
   \*********************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! next-client-pages-loader?page=%2Fnotes&absolutePagePath=%2FUsers%2Famathur%2Fworkspace%2Fopen-source%2Fajaymathur.github.io%2Fpages%2Fnotes%2Findex.tsx! */"./node_modules/next/dist/build/webpack/loaders/next-client-pages-loader.js?page=%2Fnotes&absolutePagePath=%2FUsers%2Famathur%2Fworkspace%2Fopen-source%2Fajaymathur.github.io%2Fpages%2Fnotes%2Findex.tsx!./");
+module.exports = __webpack_require__(/*! next-client-pages-loader?page=%2Fblogs&absolutePagePath=%2FUsers%2Famathur%2Fworkspace%2Fopen-source%2Fajaymathur.github.io%2Fpages%2Fblogs%2Findex.tsx! */"./node_modules/next/dist/build/webpack/loaders/next-client-pages-loader.js?page=%2Fblogs&absolutePagePath=%2FUsers%2Famathur%2Fworkspace%2Fopen-source%2Fajaymathur.github.io%2Fpages%2Fblogs%2Findex.tsx!./");
 
 
 /***/ }),
@@ -12227,5 +12186,5 @@ module.exports = dll_2adc2403d89adc16ead0;
 
 /***/ })
 
-},[[6,"static/runtime/webpack.js","styles"]]]);
-//# sourceMappingURL=notes.js.map
+},[[10,"static/runtime/webpack.js","styles"]]]);
+//# sourceMappingURL=blogs.js.map

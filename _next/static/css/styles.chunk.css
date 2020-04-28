@@ -6,18 +6,13 @@
   .list-item:hover {
     box-shadow: 0px 0px 15px 0px #cdcdcd; }
 
-* {
-  box-sizing: border-box;
-  font-family: Arial, Helvetica, sans-serif;
-  color: #4a4a4a; }
+main {
+  align-self: center;
+  width: 60%; }
 
-html {
-  height: 100%; }
-  html body {
-    height: 100%;
-    margin: 0; }
-    html body #__next {
-      height: 100%; }
+@media only screen and (max-device-width: 480px) {
+  main {
+    width: 80%; } }
 
 .mobile-nav {
   font-size: 3rem; }
@@ -38,7 +33,10 @@ html {
       text-align: right; }
       .mobile-nav nav .close-menu button {
         color: white;
-        font-size: 3rem; }
+        font-size: 3rem;
+        background: transparent;
+        padding: 7px;
+        border: none; }
     .mobile-nav nav a {
       color: white;
       display: block;
@@ -57,6 +55,19 @@ nav {
     padding: 0 20px; }
     nav a + .seperator {
       color: #dddddd; }
+
+* {
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #4a4a4a; }
+
+html {
+  height: 100%; }
+  html body {
+    height: 100%;
+    margin: 0; }
+    html body #__next {
+      height: 100%; }
 
 #homepage {
   display: flex;
@@ -82,14 +93,6 @@ nav {
   display: flex;
   flex-direction: column;
   width: 100%; }
-
-main {
-  align-self: center;
-  width: 60%; }
-
-@media only screen and (max-device-width: 480px) {
-  main {
-    width: 80%; } }
 
 
 /*# sourceMappingURL=styles.chunk.css.map*/

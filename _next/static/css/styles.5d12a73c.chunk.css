@@ -30,7 +30,10 @@ html {
       text-align: right; }
       .mobile-nav nav .close-menu button {
         color: white;
-        font-size: 3rem; }
+        font-size: 3rem;
+        background: transparent;
+        padding: 7px;
+        border: none; }
     .mobile-nav nav a {
       color: white;
       display: block;

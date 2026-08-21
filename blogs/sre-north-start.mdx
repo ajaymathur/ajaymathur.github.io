@@ -1,0 +1,141 @@
+---
+title: "SRE North Star: Keep Metrics and Detectors with Your Service Code"
+date: "2026-06-26"
+excerpt: "Metrics and alerts that live outside your service repo drift, rot, and lie. The fix is obvious once you say it out loud: co-locate them."
+tags: ["sre", "observability", "engineering"]
+---
+
+There is one practice that, if you get it right, fixes a surprising number of SRE headaches: **keep your metrics and alert detectors in the same repository as the service code that produces them.**
+
+That's it. That's the north star.
+
+Everything else — runbooks, dashboards, postmortems — can live somewhere else. But the contract between your service and your monitoring system should be versioned, reviewed, and deployed alongside the code it describes.
+
+---
+
+## The Problem with Separate Observability
+
+Most teams end up with something like this: service code lives in `github.com/org/payments-service`, and alerts live in a Datadog or PagerDuty UI, maybe imported from a separate `github.com/org/alerts` repo maintained by the platform team.
+
+This seems reasonable. Observability is cross-cutting, right? Better to centralize.
+
+It isn't. Here's what actually happens:
+
+**Alerts outlive the code they describe.** You rename a metric from `payment.latency` to `payment.process_duration_ms`. The old alert keeps firing — or worse, silently stops firing because the metric no longer exists. No one notices until 2am.
+
+**New code ships without detectors.** There's no forcing function to add an alert when you add a feature. PRs go through code review without anyone asking "what breaks silently if this path regresses?" The new checkout flow ships. Three months later, it degrades. No one knows for six hours.
+
+**On-call context is split.** Your on-call opens an incident, reads the alert, then has to switch repos to understand what the code is doing. The detector doesn't say *why* it's configured the way it is. The threshold of `p99 > 500ms` is cargo-culted from three engineers ago.
+
+---
+
+## What Co-location Actually Means
+
+"Keep metrics with the code" doesn't mean emit metrics from a config file. It means:
+
+**1. Instrumentation is in the service code.** Your service emits the metrics it cares about. This is table stakes — most teams do this with OpenTelemetry, Prometheus client libraries, or a vendor SDK. The key is that the *names* and *labels* are defined in code, not configured elsewhere.
+
+```go
+// payments/processor.go
+var processLatency = prometheus.NewHistogramVec(
+    prometheus.HistogramOpts{
+        Name:    "payment_process_duration_ms",
+        Help:    "End-to-end payment processing latency",
+        Buckets: []float64{50, 100, 250, 500, 1000, 2500},
+    },
+    []string{"provider", "status"},
+)
+```
+
+**2. Alert definitions live in the service repo.** Alerts are files. They get committed, reviewed, and deployed.
+
+```yaml
+# payments/alerts/latency.yaml
+alert: PaymentProcessingHighLatency
+expr: histogram_quantile(0.99, payment_process_duration_ms) > 500
+for: 5m
+labels:
+  severity: page
+  team: payments
+annotations:
+  summary: "p99 payment latency above 500ms for 5+ minutes"
+  runbook: "https://wiki.internal/runbooks/payments-latency"
+  threshold_rationale: "500ms is our P99 SLO; see ADR-042"
+```
+
+**3. SLOs are in the service repo.** If you have error budget policies or SLO definitions, they live here too. The SLO is a claim the service makes about itself.
+
+---
+
+## The Forcing Function
+
+When observability lives in the same PR as the feature, code review becomes the forcing function.
+
+A good PR template for your service repo might include:
+
+```
+## Observability checklist
+- [ ] New metrics added for new code paths
+- [ ] Alerts updated or added for new failure modes
+- [ ] Runbook link added to any new alert
+- [ ] Old metrics removed if code path deleted
+```
+
+Reviewers can now ask: "This adds a new payment method. What alert fires if it starts failing silently?" That question is impossible to ask when alerts live somewhere else.
+
+---
+
+## Rollbacks Become Atomic
+
+When your service degrades and you roll back to the previous version, your alerts roll back too. This matters more than it sounds.
+
+Suppose you deployed a new feature, added an alert for it, and the feature turned out to be flawed. You roll back the code. If alerts are in the same repo and deployed the same way, the alert disappears too — because the code path it was monitoring no longer exists.
+
+If alerts are separate, you now have an alert for a code path that doesn't exist, firing or silently dead, until someone manually cleans it up.
+
+---
+
+## Dead Metrics Get Deleted
+
+Metric rot is real. Services accumulate metrics that no longer reflect anything. The `legacy_checkout_flow_errors` counter that's been zero for two years but nobody deletes because nobody's sure.
+
+When metrics are defined in code, you can grep for them. When you delete the code, you delete the metric definition. When you delete the metric definition, you delete the alert that references it — because a broken alert fails CI.
+
+Co-location makes the lifecycle of a metric match the lifecycle of the code it describes.
+
+---
+
+## The Workflow
+
+In practice, this looks like:
+
+1. Metric emitted in service code via library of choice.
+2. Alert definition committed to `service/alerts/` directory.
+3. CI validates alert syntax, checks for broken metric references if possible.
+4. Deployment pipeline pushes alert definitions to your monitoring system (Terraform + Datadog provider, `kubectl apply` for Prometheus rules, or a custom sync step).
+5. On-call sees an alert, clicks the runbook link, opens the same repo to read the alert definition and the code around it.
+
+The monitoring system becomes a receiver of truth, not the source of it.
+
+---
+
+## What This Doesn't Solve
+
+Co-location is necessary but not sufficient. You still need:
+
+- Good runbooks — a well-placed alert with a useless runbook is still useless at 2am.
+- Dashboards that correspond to your SLOs, not just raw metrics.
+- Postmortems that produce new or updated detectors as an output.
+- On-call rotations and escalation paths that are actually maintained.
+
+But none of those things work well when your metrics and alerts are disconnected from the code they describe. Fix the foundation first.
+
+---
+
+## The Heuristic
+
+Before merging any non-trivial code change, ask: **if this code regresses silently, what fires?**
+
+If the answer is "nothing" or "I'd have to check the alerts repo," the PR isn't done.
+
+That's the north star.

@@ -1,0 +1,286 @@
+---
+title: "A Follow-Along Guide to Claude Code Worktrees"
+date: "2026-08-22"
+excerpt: "Walk through it with me: spin up an isolated session on a new branch, come back days later to apply review comments, and start one on a branch that already exists — local or remote."
+tags: ["claude-code", "git", "workflow", "tutorial"]
+---
+
+Run two Claude Code sessions against the same checkout and you have a race. One is halfway through editing a file when the other runs `git checkout` and swaps the branch underneath it. Nothing errors. You just get a commit with half of somebody else's feature in it.
+
+This is a follow-along guide. Open a terminal in any repo of yours and run the commands as they come. Three parts: start a session on a **new** branch, **come back to it later** to apply code review comments, and start one on a branch that **already exists**, local or remote.
+
+Everything here I ran against Claude Code **v2.1.239** and git **2.50.1** before writing it down. Command output is pasted as it actually came back. Where I couldn't test something without an interactive terminal, I say so.
+
+---
+
+## What a worktree is, in one paragraph
+
+A git worktree is a second working directory for the same repository. It has its own files and its own checked-out branch, but shares one `.git`, one history, one remote. `git worktree add` makes one; it is a plain git feature that predates Claude by a decade.
+
+Why it matters for Claude Code:
+
+- **Sessions can't collide.** Each session edits its own copy of the tree. No mid-edit branch swap.
+- **Branch switching costs nothing.** You don't stash, you walk to another directory.
+- **The isolation is enforced, not polite.** Claude blocks a worktree session from writing into your main checkout at all — more on that below.
+- **A worktree can outlive a session.** That's what makes "come back in three days for review comments" work.
+- **Your main checkout stays on `main`.** It stays buildable while three features are in flight.
+
+---
+
+## Step 0: two minutes of setup
+
+**Ignore the worktree directory.** Claude puts worktrees under `.claude/worktrees/`. Without this your main checkout shows a permanent `?? .claude/` in `git status` — I checked:
+
+```bash
+echo ".claude/" >> .gitignore
+```
+
+**Accept workspace trust once.** An interactive `--worktree` in a directory you've never run Claude in exits with an error telling you to do this first:
+
+```bash
+claude          # accept the trust prompt, then exit
+```
+
+**Carry your local config across.** A worktree is a fresh checkout, so no `.env`, no `node_modules`. A `.worktreeinclude` at the repo root copies gitignored files into every new worktree:
+
+```text
+.env.local
+config/secrets.json
+```
+
+One rule that cost me a test to find: a file is copied only if it matches a pattern **and** is gitignored. My `.env.local` matched and was not copied, because this repo's `.gitignore` didn't list it. Adding it to `.gitignore` made the copy happen. Tracked files are already in the checkout, so they're never duplicated.
+
+---
+
+## Part 1: a new feature on a new branch
+
+**1. Launch.** One command creates the worktree, the branch, and the session:
+
+```bash
+claude --worktree add-search -n search-feature
+```
+
+`-w` is the short form. You now have `.claude/worktrees/add-search/` checked out on a new branch `worktree-add-search`, with Claude running inside it. Run the same command in a second terminal with a different name and you have two sessions that cannot touch each other.
+
+The `-n` is not decoration. It names the session, which is your resume handle in Part 2, and it changes what happens at exit. Set it now.
+
+**2. Know what you branched from.** Not your current branch, and not your local `HEAD` — the default base is `origin/HEAD`, your repository's default branch on the remote. On my own repo, standing on local `main`, the new worktree came out based on `origin/dev`, because that's what `origin/HEAD` points at. If you want the worktree to carry your unpushed work instead:
+
+```json
+// .claude/settings.json
+{
+  "worktree": { "baseRef": "head" }
+}
+```
+
+`"head"` uses your local `HEAD`. `"fresh"` is the default. I tried setting it to a branch name to see what would happen — it's silently ignored and falls back to `"fresh"`. Part 3 is how you actually start from a specific branch.
+
+**3. Set the worktree up.** It's a fresh checkout, so install:
+
+```bash
+pnpm install     # or npm ci, uv sync, bundle install
+```
+
+You can just ask Claude in the session to do it.
+
+**4. Work.** Nothing special here — this is a normal session. What is special is what happens if it reaches outside. I asked a worktree session to write a file into the main checkout, and got:
+
+```text
+This session is isolated in the worktree <path>. Edit the worktree copy
+of this file instead of the shared-checkout path.
+```
+
+Four checks run, on the session and every subagent it spawns: edits targeting the main checkout, commands whose working directory resolves there, git redirected there via `git -C`, `--git-dir`, `GIT_DIR` or a `cd`, and commands whose shape can't be traced without running them. That last one is the one you'll actually hit. A heredoc with an unquoted delimiter gets refused:
+
+```text
+Heredoc with unquoted delimiter undergoes shell expansion
+```
+
+You can't turn that check off. Quote the delimiter, or split the command into separate plain ones.
+
+**5. Commit and push from inside the worktree.** Git works normally — the worktree shares the main repo's `.git`:
+
+```bash
+git add -A && git commit -m "feat: add search"
+git push -u origin worktree-add-search
+gh pr create --fill
+```
+
+**6. Exit — and keep the worktree.** On exit Claude checks the worktree for changed files, untracked files and new commits. If it finds any, it prompts you to keep or remove. **Choose keep.** The directory and branch survive, which is the whole point of Part 2.
+
+A *named* session prompts even when the worktree is clean. An unnamed clean one is removed for you. That's the second reason to pass `-n`: it stops a clean-looking worktree from vanishing on exit.
+
+Nothing will sweep it out from under you either. The periodic cleanup only touches worktrees created for subagents and background sessions, it skips any worktree holding changes or unpushed commits, and it never removes one you made with `--worktree`.
+
+---
+
+## Part 2: come back later for review comments
+
+Three days pass. Your reviewer leaves comments. The worktree is still sitting there on disk with your branch checked out.
+
+**1. Find the session.** With no arguments you get the picker:
+
+```bash
+claude --resume
+```
+
+Rows show the session name, its git branch and last activity. The shortcuts do the sorting:
+
+- `Ctrl+W` — widen to every worktree of this repository (you'll need this; by default you only see the current one)
+- `Ctrl+B` — filter to sessions on the current git branch
+- `Ctrl+A` — every project on the machine
+- `Space` to preview a session, `Ctrl+R` to rename it
+
+If you know the PR, skip the hunt:
+
+```bash
+claude --from-pr 1234
+```
+
+Pasting a PR URL into the picker's search box does the same thing. (These are the interactive bits I couldn't script — that part I'm citing from the docs, not a test run.)
+
+**2. Or resume by name, from anywhere.** This is the fast path:
+
+```bash
+claude --resume search-feature
+```
+
+**The session goes back into its worktree by itself.** I tested exactly this: started a session in `.claude/worktrees/add-search`, killed it, resumed from the main checkout, and asked for `pwd`. It answered with the worktree path. Same for `--continue`, and for `-p` in scripts.
+
+I also tried resuming from inside a *different* worktree, expecting a refusal, and it re-entered fine. The "launch from the parent checkout" advice in the docs is about worktrees Claude adopted from outside `.claude/worktrees/`; anything `--worktree` created re-enters from wherever you launch.
+
+**3. Apply the comments.** You're back with the full conversation — the plan, the dead ends, why that abstraction looks like that. Just say what the reviewer said:
+
+> Review comment: the file should say 'search feature v2'. Update SEARCH.md accordingly.
+
+I ran that verbatim against a resumed session, launched from the main checkout. It edited the worktree copy, reported the worktree as its `pwd`, and the main checkout never gained the file. Then push:
+
+```bash
+git push
+```
+
+**4. If you'd rather have fresh context on the same code**, reopen the worktree instead of resuming the session:
+
+```bash
+claude --worktree add-search
+```
+
+Pointing `--worktree` at an existing name reopens that directory rather than making a new one. I committed work in a worktree, reopened it by name, and got the same directory at the same tip with the work intact. New conversation, same code.
+
+**One trap.** If two sessions share a name, resume tells you so instead of guessing:
+
+```text
+Error: --resume "search-feature" matches 2 sessions. Pass one of these session IDs to disambiguate:
+  47ba7ea5-65e7-44ee-9ba5-0af7c7f6c180  (modified 2026-08-22T08:38:31.628Z)
+  e8b79878-cfb1-4aba-9d5d-cd0e3a25aa13  (modified 2026-08-22T08:38:02.899Z)
+```
+
+Interactive sessions auto-rename a duplicate for you. `-p` and background sessions don't get that check, which is how I produced this. Pass the ID.
+
+**5. After the merge, retire it.** Reopening the name resets the worktree to the default branch once its remote branch is deleted and its commits have landed. Or do it by hand — this is the real sequence, errors included:
+
+```bash
+git worktree list                              # audit what you're holding
+git worktree remove .claude/worktrees/add-search
+# fatal: cannot remove a locked working tree, lock reason: claude session add-search
+git worktree unlock .claude/worktrees/add-search
+git worktree remove .claude/worktrees/add-search
+# fatal: '...' contains modified or untracked files, use --force to delete it
+git worktree remove --force .claude/worktrees/add-search
+```
+
+Claude locks a worktree while a session is using it. A `-p` run never cleans up after itself, so scripted runs leave locked worktrees behind until a later session's sweep releases them.
+
+---
+
+## Part 3: a worktree on a branch that already exists
+
+`--worktree` always makes a new branch. For an existing one, use git to create the worktree and then start Claude in it. Three cases, three different behaviours.
+
+**A remote branch you don't have locally.** Fetch first, then name the branch bare — git figures out the remote for you:
+
+```bash
+git fetch origin
+git worktree add ../site-review fix-pnpm-lockfile
+```
+
+```text
+Preparing worktree (new branch 'fix-pnpm-lockfile')
+branch 'fix-pnpm-lockfile' set up to track 'origin/fix-pnpm-lockfile'.
+```
+
+You get a local branch tracking the remote — so `git push` later just works.
+
+**The trap: don't write `origin/` in front of it.** That gives you a detached HEAD, and commits you make there belong to no branch:
+
+```bash
+git worktree add ../site-review origin/fix-pnpm-lockfile
+# Preparing worktree (detached HEAD 195e8b79)
+```
+
+If you want the remote branch under a different local name, be explicit:
+
+```bash
+git worktree add -b review-lockfile ../site-review origin/fix-pnpm-lockfile
+# branch 'review-lockfile' set up to track 'origin/fix-pnpm-lockfile'.
+```
+
+**A branch you already have locally.** Same command, no fetch:
+
+```bash
+git worktree add ../site-fix-456 fix-issue-456
+```
+
+**One branch, one worktree.** Git refuses to check the same branch out twice, including in your main checkout:
+
+```text
+fatal: 'main' is already used by worktree at '/path/to/site'
+```
+
+That's a feature. It's the rule that makes collisions impossible.
+
+**Then start the session:**
+
+```bash
+cd ../site-review
+claude -n review-lockfile
+```
+
+This session has no worktree binding to restore — it simply belongs to that directory. Come back to it with `claude --continue` or `claude --resume review-lockfile` from that same directory. I verified both.
+
+**Shortcut for pull requests.** If the branch you want is a PR, skip git entirely:
+
+```bash
+claude --worktree "#1234"
+```
+
+That fetches the PR head into `.claude/worktrees/pr-1234`. Quote the argument or your shell eats the `#` as a comment. GitLab merge request URLs work too.
+
+---
+
+## Sharp edges worth knowing
+
+- **Subagents can be isolated too.** Add `isolation: worktree` to a subagent's frontmatter in `.claude/agents/` and it runs in its own worktree — mine reported back from a branch named `worktree-agent-a5679ab4`. These are meant to be swept up automatically, but mine outlived the run, so check `git worktree list` occasionally rather than assuming.
+- **Hooks don't follow you.** `${CLAUDE_PROJECT_DIR}` still points at the project root after Claude enters a worktree. The `cwd` field in the hook's input JSON is the worktree path — read that instead.
+- **Shared with the main checkout:** the `.git` directory, project-scope plugins, and saved permission approvals. **Not shared:** `.env`, `node_modules`, anything gitignored that `.worktreeinclude` doesn't name.
+- **`--tmux`** isn't on the worktrees docs page but is in `claude --help`. It pairs with `--worktree` and opens the session in its own tmux window. Useful once you're running three of these.
+
+---
+
+## The commands worth memorising
+
+```bash
+claude --worktree add-search -n search-feature   # part 1: new branch, new session
+claude --resume search-feature                   # part 2: back into that worktree
+claude --resume                                  # picker; Ctrl+W, Ctrl+B
+claude --from-pr 1234                            # sessions for that PR
+claude --worktree add-search                     # same code, fresh context
+git worktree add ../site-review some-branch      # part 3: existing branch, then cd && claude
+claude --worktree "#1234"                        # worktree straight from a PR
+git worktree list                                # what am I still holding
+git worktree remove --force <path>               # retire it, post-merge
+```
+
+The rule I follow: one worktree per PR, named the same as the session, removed the day it merges.
+
+If `git worktree list` is longer than your list of open PRs, you have cleanup to do.

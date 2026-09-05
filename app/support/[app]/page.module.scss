@@ -1,0 +1,82 @@
+.header {
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.kicker {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: 0.75rem;
+
+  a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--color-text);
+      text-decoration: underline;
+    }
+  }
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 0.75rem;
+}
+
+.tagline {
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  margin-bottom: 1.25rem;
+}
+
+.platforms {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 1.25rem;
+
+  li {
+    display: flex;
+    gap: 0.75rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+}
+
+.platformName {
+  font-weight: 600;
+  min-width: 4.5rem;
+}
+
+.platformReq {
+  color: var(--color-text-muted);
+}
+
+.actions {
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+
+  a {
+    font-size: 0.875rem;
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    padding: 0.3rem 0.6rem;
+    border-radius: 3px;
+    text-decoration: none;
+    transition: border-color 0.15s ease;
+
+    &:hover {
+      border-color: var(--color-text-muted);
+      text-decoration: none;
+    }
+  }
+}

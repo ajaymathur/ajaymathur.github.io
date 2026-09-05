@@ -4,31 +4,36 @@
   border-bottom: 1px solid var(--color-border);
 }
 
-.date {
-  display: block;
+.kicker {
   font-size: 0.75rem;
   letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--color-text-muted);
   margin-bottom: 0.75rem;
+
+  a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--color-text);
+      text-decoration: underline;
+    }
+  }
+}
+
+.sep {
+  margin: 0 0.5rem;
 }
 
 .title {
   font-size: 2rem;
   font-weight: 700;
   line-height: 1.2;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
 }
 
-.tags {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.tag {
-  font-size: 0.75rem;
+.updated {
+  font-size: 0.875rem;
   color: var(--color-text-muted);
-  border: 1px solid var(--color-border);
-  padding: 0.15rem 0.5rem;
-  border-radius: 3px;
 }

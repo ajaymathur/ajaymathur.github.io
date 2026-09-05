@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { getAllPosts, getPostBySlug } from '@/lib/posts'
+import Prose from '@/components/Prose/Prose'
 import styles from './page.module.scss'
 
 type Props = { params: Promise<{ slug: string }> }
@@ -39,9 +40,9 @@ export default async function BlogPost({ params }: Props) {
           </div>
         )}
       </header>
-      <div className={styles.content}>
+      <Prose>
         <PostContent />
-      </div>
+      </Prose>
     </article>
   )
 }

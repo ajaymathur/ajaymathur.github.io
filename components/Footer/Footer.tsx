@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import styles from './Footer.module.scss'
 
 export default function Footer() {
@@ -6,6 +7,7 @@ export default function Footer() {
       <div className={styles.inner}>
         <p className={styles.heading}>Connect</p>
         <div className={styles.links}>
+          <Link href="/support">Apps</Link>
           <a
             href="https://github.com/ajaymathur"
             target="_blank"

@@ -1,10 +1,200 @@
 ---
 title: "Creating a REPL"
 date: "2026-08-22"
-excerpt: "Placeholder post — content coming soon."
-tags: ["placeholder"]
+excerpt: "Building an in-browser TypeScript REPL: syntax highlighting, a real language server for autocomplete and type errors, and running untrusted code without letting it eat your server."
+tags: ["typescript", "language-server", "sandboxing", "compilers"]
 ---
 
 ## Creating a REPL
 
-Content here
+A REPL that just runs `eval()` on a `<textarea>` is a few hours of work. A REPL that feels like an editor — autocomplete, inline type errors, syntax highlighting — while also being safe to point at strangers' code, is a different project. There are three mostly-independent subsystems involved, and it's worth treating them that way:
+
+1. **Syntax highlighting** — making the code look like code as you type it.
+2. **Language intelligence** — autocomplete, hover types, red squiggles, powered by the actual TypeScript compiler.
+3. **Execution** — running the code and getting results back, without trusting it.
+
+None of these need each other. You can ship highlighting with no language server at all, and you can execute code with no editor in front of it. Keeping them decoupled is what keeps the project tractable.
+
+---
+
+## 1. Syntax highlighting
+
+Two real options here, and they solve different problems:
+
+- **Shiki** — takes a string, returns highlighted HTML. Uses the same TextMate grammars and themes as VS Code, so the output matches what people already expect a TypeScript file to look like. Good for *rendering* code (like the snippets in this post) but not for an editable surface — there's no cursor, no selection, no keyboard handling.
+- **CodeMirror 6** (or Monaco) — an actual editable text editor component with a tokenizer built in. This is what you want for the input pane of a REPL.
+
+CodeMirror 6's TypeScript/JSX language support comes from `@codemirror/lang-javascript`, which does its own lightweight lexing for highlighting — fast, but it doesn't know your types. That's fine; highlighting and type-checking are separate passes, and conflating them is a common mistake that makes the editor feel laggy, because now every keystroke waits on the compiler.
+
+```ts
+import { EditorView, basicSetup } from "codemirror"
+import { javascript } from "@codemirror/lang-javascript"
+
+const view = new EditorView({
+  doc: "const greeting: string = 'hello'",
+  extensions: [basicSetup, javascript({ typescript: true })],
+  parent: document.querySelector("#editor")!,
+})
+```
+
+That alone gets you a colored, editable pane. No type information yet — that's the next layer.
+
+---
+
+## 2. Running a TypeScript language server
+
+"Language server" specifically means something: a process implementing the [Language Server Protocol](https://microsoft.github.io/language-server-protocol/) (LSP) — JSON-RPC requests like `textDocument/completion`, `textDocument/hover`, `textDocument/publishDiagnostics`. TypeScript ships one, `typescript-language-server`, wrapping `tsserver`.
+
+For a browser-based REPL, running a full LSP server as a separate OS process and speaking JSON-RPC over stdio is overkill — that protocol exists so any editor can talk to any language server over a socket. In-browser, you control both ends, so it's simpler to skip LSP-the-protocol and use the TypeScript compiler's own `LanguageService` API directly, inside a Web Worker so it doesn't block the UI thread.
+
+```ts
+// ts-worker.ts
+import * as ts from "typescript"
+
+const files = new Map<string, string>()
+files.set("main.ts", "")
+
+const host: ts.LanguageServiceHost = {
+  getScriptFileNames: () => [...files.keys()],
+  getScriptVersion: () => "1",
+  getScriptSnapshot: (fileName) => {
+    const content = files.get(fileName)
+    return content !== undefined ? ts.ScriptSnapshot.fromString(content) : undefined
+  },
+  getCurrentDirectory: () => "/",
+  getCompilationSettings: () => ({
+    target: ts.ScriptTarget.ES2020,
+    module: ts.ModuleKind.ESNext,
+    strict: true,
+    lib: ["lib.es2020.d.ts"],
+  }),
+  getDefaultLibFileName: (options) => ts.getDefaultLibFilePath(options),
+  fileExists: ts.sys.fileExists,
+  readFile: ts.sys.readFile,
+}
+
+const service = ts.createLanguageService(host, ts.createDocumentRegistry())
+
+self.onmessage = (e) => {
+  const { type, fileName, content, position } = e.data
+
+  if (type === "update") {
+    files.set(fileName, content)
+    const diagnostics = [
+      ...service.getSyntacticDiagnostics(fileName),
+      ...service.getSemanticDiagnostics(fileName),
+    ]
+    self.postMessage({ type: "diagnostics", diagnostics })
+  }
+
+  if (type === "completion") {
+    const completions = service.getCompletionsAtPosition(fileName, position, {})
+    self.postMessage({ type: "completions", completions })
+  }
+}
+```
+
+`getDefaultLibFileName`/`readFile` need `lib.es2020.d.ts` and friends to actually be reachable — in a worker with no filesystem, that means fetching them once (they're static files, ~a few hundred KB total) and serving them out of an in-memory map instead of `ts.sys.readFile`. This is the part people trip on: the compiler needs the *lib* declaration files to know what `Array.prototype.map` is, separately from your source file.
+
+Wire the worker's `diagnostics` messages to CodeMirror's [`@codemirror/lint`](https://codemirror.net/docs/ref/#lint) extension and the squiggles show up under real type errors, not just syntax errors.
+
+---
+
+## 3. Running the code somewhere safe
+
+This is the part that actually matters if the REPL is public. "Someone pastes in `while(true){}` or `fetch('http://internal-metadata-service/')` or `require('fs').readFileSync('/etc/passwd')`" is not a hypothetical — it's the first thing anyone will try, whether maliciously or by accident.
+
+A few approaches, roughly in order of how much you'd trust them:
+
+| Approach | Isolation | Notes |
+|---|---|---|
+| `eval` / `new Function` | None | Full access to the host's globals, DOM, closures. Never do this with untrusted input. |
+| `vm2` (Node) | Weak | Multiple sandbox-escape CVEs over the years; the project is unmaintained. Don't use it for real isolation. |
+| `iframe sandbox` + Worker (browser) | Medium | `<iframe sandbox="allow-scripts">` with no `allow-same-origin` gets a null origin — no access to parent DOM, cookies, or storage. Combine with a Worker inside it to also get a separate thread. Good enough when everything stays client-side. |
+| `isolated-vm` (Node) | Strong | Real V8 isolates, separate heap, no access to Node's `require`/`fs`/`process` unless you explicitly expose bindings. |
+| Container / microVM (Firecracker, gVisor) | Strongest | Actual OS-level isolation — separate kernel view, cgroup limits, network namespace. What Playground-style products (CodeSandbox, StackBlitz's server mode, Val Town) reach for at scale. |
+
+For a personal-site REPL, the practical choice is usually **iframe-sandboxed execution in the browser** — no server round-trip, no server to attack, and the isolation is provided by the browser's own security model rather than something you built:
+
+```html
+<!-- served with no allow-same-origin, so it's cross-origin from the parent -->
+<iframe id="sandbox" sandbox="allow-scripts" srcdoc="
+  <script>
+    self.onmessage = async (e) => {
+      const logs = []
+      const console = { log: (...args) => logs.push(args.join(' ')) }
+      try {
+        const fn = new Function('console', e.data.code)
+        fn(console)
+        parent.postMessage({ logs, error: null }, '*')
+      } catch (err) {
+        parent.postMessage({ logs, error: String(err) }, '*')
+      }
+    }
+  </script>
+"></iframe>
+```
+
+```ts
+const sandbox = document.querySelector<HTMLIFrameElement>("#sandbox")!
+
+function run(code: string, timeoutMs = 2000): Promise<{ logs: string[]; error: string | null }> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error("Timed out")), timeoutMs)
+    const handler = (e: MessageEvent) => {
+      clearTimeout(timer)
+      window.removeEventListener("message", handler)
+      resolve(e.data)
+    }
+    window.addEventListener("message", handler)
+    sandbox.contentWindow!.postMessage({ code }, "*")
+  })
+}
+```
+
+A few things doing real work in that snippet, worth calling out explicitly:
+
+- **No `allow-same-origin`** — this is what actually makes it a different origin from the parent page, even though the content is inline `srcdoc`. Add that token back and the sandbox can read the parent's cookies and reach into its DOM; the whole scheme depends on leaving it out.
+- **The timeout is enforced by the parent, not the iframe.** An infinite loop inside the iframe will hang that frame's thread, but `postMessage` never fires, so the parent's `setTimeout` fires first and the promise rejects. The hung iframe itself should then be discarded and replaced (drop the DOM node, mount a fresh one) rather than reused — an iframe running a tight `while(true)` loop stays consuming CPU on its own thread even after you've stopped listening to it.
+- **TypeScript needs transpiling first.** The iframe runs plain JS (`new Function`), so run the editor's TS source through `ts.transpileModule` (fast, no type-checking — that already happened in the worker) before posting it in.
+
+If you outgrow client-side execution — you want the REPL to `fetch` real APIs server-side, or run for longer than a browser tab tolerates — the same shape moves to the server with `isolated-vm`, and the security-relevant defaults become explicit code instead of browser semantics you're relying on:
+
+```ts
+import ivm from "isolated-vm"
+
+async function run(code: string, timeoutMs = 2000) {
+  const isolate = new ivm.Isolate({ memoryLimit: 32 }) // MB
+  try {
+    const context = await isolate.createContext()
+    const logs: string[] = []
+    await context.global.set("__log", (...args: unknown[]) => {
+      logs.push(args.map(String).join(" "))
+    })
+    await context.eval(
+      `globalThis.console = { log: (...a) => __log(...a) }`
+    )
+    const script = await isolate.compileScript(code)
+    await script.run(context, { timeout: timeoutMs })
+    return { logs, error: null }
+  } catch (error) {
+    return { logs: [], error: String(error) }
+  } finally {
+    isolate.dispose()
+  }
+}
+```
+
+No `require`, no `fs`, no `process`, no network — those only exist inside the isolate if you explicitly bind them onto `context.global`, which for a REPL you mostly shouldn't.
+
+---
+
+## Putting it together
+
+The full request path, once all three pieces exist:
+
+1. Keystroke → CodeMirror updates the doc → tokenizer re-highlights the visible range (synchronous, on the main thread, cheap).
+2. Debounced (150–300ms) → post the full source to the TS worker → `LanguageService` re-checks → diagnostics come back → lint extension renders squiggles.
+3. "Run" click → transpile the current buffer with `ts.transpileModule` → post to the sandbox (iframe or `isolated-vm`) → collect `logs`/`error` → render in an output pane.
+
+Highlighting and diagnostics run continuously and cheaply as you type; execution only happens on demand and is the one path that touches anything resembling untrusted-code risk — which is exactly why it's worth keeping it the most separate of the three.

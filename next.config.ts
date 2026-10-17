@@ -1,6 +1,5 @@
 import type { NextConfig } from 'next'
 import createMDX from '@next/mdx'
-import remarkFrontmatter from 'remark-frontmatter'
 
 const nextConfig: NextConfig = {
   output: 'export',
@@ -10,7 +9,8 @@ const nextConfig: NextConfig = {
 
 const withMDX = createMDX({
   options: {
-    remarkPlugins: [remarkFrontmatter],
+    // Plugins are referenced by package name: Turbopack (default since Next 16) requires serializable loader options.
+    remarkPlugins: ['remark-frontmatter'],
   },
 })
 

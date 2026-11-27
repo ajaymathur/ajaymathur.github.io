@@ -8,18 +8,21 @@
   display: block;
   font-size: 0.75rem;
   letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--color-text-muted);
   margin-bottom: 0.75rem;
 }
 
 .title {
-  font-size: 2rem;
+  font-size: clamp(1.625rem, 1.2rem + 2vw, 2rem);
   font-weight: 700;
   line-height: 1.2;
+  text-wrap: balance;
   margin-bottom: 1rem;
 }
 
 .tags {
+  list-style: none;
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;

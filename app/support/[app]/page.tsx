@@ -27,9 +27,9 @@ export default async function AppSupport({ params }: Props) {
   return (
     <article>
       <header className={styles.header}>
-        <p className={styles.kicker}>
+        <nav aria-label="Breadcrumb" className={styles.kicker}>
           <Link href="/support">App Support</Link>
-        </p>
+        </nav>
         <h1 className={styles.title}>{meta.name}</h1>
         <p className={styles.tagline}>{meta.tagline}</p>
         {meta.platforms.length > 0 && (
@@ -38,7 +38,10 @@ export default async function AppSupport({ params }: Props) {
               <li key={p.name}>
                 <span className={styles.platformName}>
                   {p.url ? (
-                    <a href={p.url} target="_blank" rel="noopener noreferrer">{p.name}</a>
+                    <a href={p.url} target="_blank" rel="noopener noreferrer">
+                      {p.name}
+                      <span className="visually-hidden"> (opens in a new tab)</span>
+                    </a>
                   ) : (
                     p.name
                   )}

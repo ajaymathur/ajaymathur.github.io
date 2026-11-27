@@ -15,13 +15,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){var s=localStorage.getItem('theme');var d=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',s||d);})();`,
+            __html: `(function(){var s;try{s=localStorage.getItem('theme')}catch(e){}var d=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',s||d);})();`,
           }}
         />
       </head>
       <body>
+        <a href="#main" className="skip-link">Skip to content</a>
         <Header />
-        <main className={styles.main}>{children}</main>
+        <main id="main" className={styles.main}>{children}</main>
         <Footer />
       </body>
     </html>

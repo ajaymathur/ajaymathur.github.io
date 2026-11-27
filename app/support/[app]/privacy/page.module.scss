@@ -27,9 +27,10 @@
 }
 
 .title {
-  font-size: 2rem;
+  font-size: clamp(1.625rem, 1.2rem + 2vw, 2rem);
   font-weight: 700;
   line-height: 1.2;
+  text-wrap: balance;
   margin-bottom: 0.75rem;
 }
 

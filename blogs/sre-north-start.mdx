@@ -21,7 +21,7 @@ This seems reasonable. Observability is cross-cutting, right? Better to centrali
 
 It isn't. Here's what actually happens:
 
-**Alerts outlive the code they describe.** You rename a metric from `payment.latency` to `payment.process_duration_ms`. The old alert keeps firing — or worse, silently stops firing because the metric no longer exists. No one notices until 2am.
+**Alerts outlive the code they describe.** You rename a metric from `payment_latency` to `payment_process_duration_seconds`. The old alert keeps firing — or worse, silently stops firing because the metric no longer exists. No one notices until 2am.
 
 **New code ships without detectors.** There's no forcing function to add an alert when you add a feature. PRs go through code review without anyone asking "what breaks silently if this path regresses?" The new checkout flow ships. Three months later, it degrades. No one knows for six hours.
 
@@ -37,31 +37,41 @@ It isn't. Here's what actually happens:
 
 ```go
 // payments/processor.go
-var processLatency = prometheus.NewHistogramVec(
+var processLatency = promauto.NewHistogramVec(
     prometheus.HistogramOpts{
-        Name:    "payment_process_duration_ms",
+        Name:    "payment_process_duration_seconds",
         Help:    "End-to-end payment processing latency",
-        Buckets: []float64{50, 100, 250, 500, 1000, 2500},
+        Buckets: []float64{0.05, 0.1, 0.25, 0.5, 1, 2.5},
     },
     []string{"provider", "status"},
 )
 ```
 
+Prometheus convention is base units in the name: seconds, not milliseconds. `promauto` registers the metric for you.
+
 **2. Alert definitions live in the service repo.** Alerts are files. They get committed, reviewed, and deployed.
 
 ```yaml
 # payments/alerts/latency.yaml
-alert: PaymentProcessingHighLatency
-expr: histogram_quantile(0.99, payment_process_duration_ms) > 500
-for: 5m
-labels:
-  severity: page
-  team: payments
-annotations:
-  summary: "p99 payment latency above 500ms for 5+ minutes"
-  runbook: "https://wiki.internal/runbooks/payments-latency"
-  threshold_rationale: "500ms is our P99 SLO; see ADR-042"
+groups:
+  - name: payments-latency
+    rules:
+      - alert: PaymentProcessingHighLatency
+        expr: |
+          histogram_quantile(0.99,
+            sum by (le) (rate(payment_process_duration_seconds_bucket[5m]))
+          ) > 0.5
+        for: 5m
+        labels:
+          severity: page
+          team: payments
+        annotations:
+          summary: "p99 payment latency above 500ms for 5+ minutes"
+          runbook_url: "https://wiki.internal/runbooks/payments-latency"
+          threshold_rationale: "500ms is our P99 SLO; see ADR-042"
 ```
+
+Note the `_bucket` series and the `rate()`: `histogram_quantile` needs per-bucket rates, not the raw histogram name.
 
 **3. SLOs are in the service repo.** If you have error budget policies or SLO definitions, they live here too. The SLO is a claim the service makes about itself.
 
@@ -73,7 +83,7 @@ When observability lives in the same PR as the feature, code review becomes the 
 
 A good PR template for your service repo might include:
 
-```
+```markdown
 ## Observability checklist
 - [ ] New metrics added for new code paths
 - [ ] Alerts updated or added for new failure modes
@@ -99,7 +109,7 @@ If alerts are separate, you now have an alert for a code path that doesn't exist
 
 Metric rot is real. Services accumulate metrics that no longer reflect anything. The `legacy_checkout_flow_errors` counter that's been zero for two years but nobody deletes because nobody's sure.
 
-When metrics are defined in code, you can grep for them. When you delete the code, you delete the metric definition. When you delete the metric definition, you delete the alert that references it — because a broken alert fails CI.
+When metrics are defined in code, you can grep for them. When you delete the code, you delete the metric definition. When you delete the metric definition, you delete the alert that references it — because CI checks that every alert's metrics still exist, and a dangling alert fails the build. (`promtool check rules` only checks syntax; a linter like Cloudflare's [`pint`](https://github.com/cloudflare/pint) can check metric references against a live Prometheus.)
 
 Co-location makes the lifecycle of a metric match the lifecycle of the code it describes.
 
@@ -111,8 +121,8 @@ In practice, this looks like:
 
 1. Metric emitted in service code via library of choice.
 2. Alert definition committed to `service/alerts/` directory.
-3. CI validates alert syntax, checks for broken metric references if possible.
-4. Deployment pipeline pushes alert definitions to your monitoring system (Terraform + Datadog provider, `kubectl apply` for Prometheus rules, or a custom sync step).
+3. CI validates alert syntax (`promtool check rules`) and checks for broken metric references (`pint`).
+4. Deployment pipeline pushes alert definitions to your monitoring system (Terraform + Datadog provider, `kubectl apply` of `PrometheusRule` resources if you run the Prometheus Operator, or a custom sync step).
 5. On-call sees an alert, clicks the runbook link, opens the same repo to read the alert definition and the code around it.
 
 The monitoring system becomes a receiver of truth, not the source of it.

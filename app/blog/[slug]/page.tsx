@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { getAllPosts, getPostBySlug } from '@/lib/posts'
+import { formatDate } from '@/lib/date'
 import Prose from '@/components/Prose/Prose'
 import styles from './page.module.scss'
 
@@ -15,12 +16,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return { title: `${post.title} — Ajay N Mathur`, description: post.excerpt }
 }
 
-function formatDate(dateStr: string): string {
-  return new Date(dateStr)
-    .toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-    .toUpperCase()
-}
-
 export default async function BlogPost({ params }: Props) {
   const { slug } = await params
   const post = getPostBySlug(slug)
@@ -30,14 +25,14 @@ export default async function BlogPost({ params }: Props) {
   return (
     <article>
       <header className={styles.header}>
-        <time className={styles.date}>{formatDate(post.date)}</time>
+        <time dateTime={post.date} className={styles.date}>{formatDate(post.date)}</time>
         <h1 className={styles.title}>{post.title}</h1>
         {post.tags.length > 0 && (
-          <div className={styles.tags}>
+          <ul className={styles.tags} aria-label="Tags">
             {post.tags.map(tag => (
-              <span key={tag} className={styles.tag}>{tag}</span>
+              <li key={tag} className={styles.tag}>{tag}</li>
             ))}
-          </div>
+          </ul>
         )}
       </header>
       <Prose>

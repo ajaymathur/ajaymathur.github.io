@@ -5,7 +5,8 @@
   cursor: pointer;
   font-family: var(--font-family);
   font-size: 0.75rem;
-  padding: 0.3rem 0.6rem;
+  min-height: 2rem;
+  padding: 0.3rem 0.75rem;
   border-radius: 3px;
   white-space: nowrap;
   transition: border-color 0.15s ease, color 0.15s ease;

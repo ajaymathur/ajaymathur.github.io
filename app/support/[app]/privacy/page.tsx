@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getAllApps, getApp, getAppPrivacy, hasPrivacyPolicy } from '@/lib/apps'
+import { formatDate } from '@/lib/date'
 import Prose from '@/components/Prose/Prose'
 import styles from './page.module.scss'
 
@@ -24,14 +25,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('en-US', {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-  })
-}
-
 export default async function AppPrivacy({ params }: Props) {
   const { app } = await params
   const meta = getApp(app)
@@ -42,13 +35,15 @@ export default async function AppPrivacy({ params }: Props) {
   return (
     <article>
       <header className={styles.header}>
-        <p className={styles.kicker}>
+        <nav aria-label="Breadcrumb" className={styles.kicker}>
           <Link href="/support">App Support</Link>
-          <span className={styles.sep}>/</span>
+          <span className={styles.sep} aria-hidden="true">/</span>
           <Link href={`/support/${app}`}>{meta.name}</Link>
-        </p>
+        </nav>
         <h1 className={styles.title}>{privacy.title}</h1>
-        <p className={styles.updated}>Last updated {formatDate(privacy.updated)}</p>
+        <p className={styles.updated}>
+          Last updated <time dateTime={privacy.updated}>{formatDate(privacy.updated, 'long')}</time>
+        </p>
       </header>
       <Prose>
         <Content />

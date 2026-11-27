@@ -6,6 +6,15 @@
     margin-top: 2rem;
     margin-bottom: 0.75rem;
     line-height: 1.3;
+    text-wrap: balance;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  h3 {
+    font-size: 1.2rem;
   }
 
   p {
@@ -18,23 +27,30 @@
   }
 
   code {
-    font-family: 'Fira Code', 'Courier New', monospace;
+    font-family: var(--font-mono);
     font-size: 0.875em;
-    background: var(--color-border);
-    padding: 0.125rem 0.3rem;
-    border-radius: 2px;
+    background: var(--color-code-bg);
+    border: 1px solid var(--color-border);
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
   }
 
   pre {
-    background: var(--color-border);
+    background: var(--color-code-bg);
+    border: 1px solid var(--color-border);
     padding: 1rem;
     border-radius: 4px;
     overflow-x: auto;
     margin-bottom: 1.25rem;
+    font-size: 0.875rem;
+    line-height: 1.55;
+    tab-size: 2;
 
     code {
       background: none;
+      border: 0;
       padding: 0;
+      font-size: inherit;
     }
   }
 

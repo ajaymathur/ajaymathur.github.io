@@ -26,6 +26,8 @@ git worktree list
 
 That's a complete second checkout, created in about a second, because nothing is re-cloned and nothing is re-fetched.
 
+![Diagram: one shared .git directory holding objects, refs, remotes, config, stashes and hooks, with three working directories pointing at it: the main checkout on branch main, ../proj-feature-a made with git worktree add on branch feature-a, and proj-482 made with claude --worktree on branch worktree-proj-482. Each has its own HEAD and index. In the linked worktrees, .git is a file pointing at .git/worktrees/.](/blog/git-worktrees-and-stacked-prs/one-git-many-worktrees.svg)
+
 The mechanism is worth seeing once. In a linked worktree, `.git` is a *file*, not a directory — a single line pointing back at `.git/worktrees/<name>` in the main repo, where that worktree's private state lives:
 
 ```bash
@@ -138,6 +140,8 @@ Notice what I am *not* doing: a worktree per layer.
 **One worktree for the ticket. The whole stack lives inside it.** Git won't check out the same branch twice, so a layer parked in a second worktree can only be rebased through that worktree — and if it's dirty, `gh stack rebase` and `sync` stop. Keep the stack in one place and none of that comes up.
 
 Worktree isolation is per *context*. A stack is per *decomposition of one change* inside that context.
+
+![Diagram: inside one worktree, .claude/worktrees/proj-482, four stacked PRs sit on top of main, each targeting the branch below: PR 1 config and types, PR 2 rate limiter and tests, PR 3 wire into routes, PR 4 docs. A red arrow shows that after a review asks for a rename in PR 1, gh stack rebase replays every layer above it. Merges go bottom-up.](/blog/git-worktrees-and-stacked-prs/one-worktree-one-stack.svg)
 
 ## When layer one changes
 

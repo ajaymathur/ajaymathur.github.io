@@ -123,6 +123,8 @@ A few approaches, roughly in order of how much you'd trust them:
 - **`isolated-vm` (Node) — strong.** Real V8 isolates, separate heap, no access to Node's `require`/`fs`/`process` unless you explicitly expose bindings. It's in maintenance mode, so check it supports your Node version.
 - **Container / microVM (Firecracker, gVisor) — strongest.** Actual OS-level isolation — separate kernel view, cgroup limits, network namespace. What hosted sandboxes reach for at scale; CodeSandbox, for one, runs on Firecracker microVMs.
 
+![Sketch of isolation strength rising left to right: eval or new Function (none), vm2 (weak), sandboxed iframe plus Worker (medium), isolated-vm (strong), container or microVM (strongest). More isolation means more infrastructure to run.](/blog/creating-a-repl/isolation-ladder.svg)
+
 For a personal-site REPL, the practical choice is usually **iframe-sandboxed execution in the browser** — no server round-trip, no server to attack, and the isolation is provided by the browser's own security model rather than something you built:
 
 ```html
@@ -219,5 +221,7 @@ The full request path, once all three pieces exist:
 1. Keystroke → CodeMirror updates the doc → tokenizer re-highlights the visible range (synchronous, on the main thread, cheap).
 2. Debounced (150–300ms) → post the full source to the TS worker → `LanguageService` re-checks → diagnostics come back → lint extension renders squiggles.
 3. "Run" click → transpile the current buffer with `ts.transpileModule` → post to the sandbox (iframe or `isolated-vm`) → collect `logs`/`error` → render in an output pane.
+
+![Diagram of the REPL's three subsystems: the CodeMirror editor on the main thread sends debounced source to a TypeScript worker running LanguageService, which sends diagnostics back. Pressing Run sends the code through ts.transpileModule to a sandbox, an iframe or isolated-vm, which returns logs or an error to the output pane. Highlighting and type errors are always on and cheap; execution is on demand and the only risky path.](/blog/creating-a-repl/three-subsystems.svg)
 
 Highlighting and diagnostics run continuously and cheaply as you type; execution only happens on demand and is the one path that touches anything resembling untrusted-code risk — which is exactly why it's worth keeping it the most separate of the three.

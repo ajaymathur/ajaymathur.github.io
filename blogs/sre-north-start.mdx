@@ -27,6 +27,8 @@ It isn't. Here's what actually happens:
 
 **On-call context is split.** Your on-call opens an incident, reads the alert, then has to switch repos to understand what the code is doing. The detector doesn't say *why* it's configured the way it is. The threshold of `p99 > 500ms` is cargo-culted from three engineers ago.
 
+![Diagram comparing two setups. Left, alerts live elsewhere: the service repo renames a metric while a separate alerts repo still queries the old name, so the alert drifts and goes quiet until someone notices at 2am. Right, alerts live with the code: one repo holds code, metrics, alerts and SLOs, and CI plus deploy push them to the monitoring system, with the same PR, same review and same rollback.](/blog/sre-north-start/split-vs-colocated.svg)
+
 ---
 
 ## What Co-location Actually Means
@@ -124,6 +126,8 @@ In practice, this looks like:
 3. CI validates alert syntax (`promtool check rules`) and checks for broken metric references (`pint`).
 4. Deployment pipeline pushes alert definitions to your monitoring system (Terraform + Datadog provider, `kubectl apply` of `PrometheusRule` resources if you run the Prometheus Operator, or a custom sync step).
 5. On-call sees an alert, clicks the runbook link, opens the same repo to read the alert definition and the code around it.
+
+![Diagram of a five-step loop: metric emitted in service code, alert committed to service/alerts/, CI checks it with promtool and pint, deploy pushes rules to monitoring, the alert fires and on-call reads it in the repo, and the next PR starts the loop again.](/blog/sre-north-start/workflow-loop.svg)
 
 The monitoring system becomes a receiver of truth, not the source of it.
 

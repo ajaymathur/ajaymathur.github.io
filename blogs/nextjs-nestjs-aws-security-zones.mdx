@@ -37,6 +37,8 @@ Four rules turn those boxes into zones:
 3. **Every hop re-checks identity.** Being inside the VPC proves nothing.
 4. **Each boundary is enforced twice**, by the network (subnets, routes, security groups) and by identity (IAM, tokens). Either one alone eventually grows a hole.
 
+Rule 4 is how AWS's Well-Architected Framework describes [protecting networks](https://docs.aws.amazon.com/wellarchitected/latest/framework/sec05.html): "identity decides who can call an action, and the network decides which components can communicate at all." It also explains why one perimeter isn't enough: "A flat network where every resource can reach every other resource offers no containment, so a single point of unauthorized access exposes everything behind it."
+
 Rule 3 is what NIST calls zero trust: "no implicit trust granted to assets or user accounts based solely on their physical or network location" ([SP 800-207](https://csrc.nist.gov/pubs/sp/800/207/final)). Google's version, [BeyondProd](https://cloud.google.com/docs/security/beyondprod), is blunter: "Only authenticated, trusted, and specifically authorized callers or services can access any other service." Zones aren't the opposite of zero trust. They limit the damage when one of the trusted things turns out not to be.
 
 ## Zone 0: the edge
@@ -59,7 +61,7 @@ Without VPC origins, the older pattern is a public ALB whose security group allo
 
 ## Zone 1: Next.js as a backend-for-frontend
 
-Next.js runs as an ECS Fargate service, built with `output: 'standalone'`, in private subnets behind the internal ALB. Its job is the **backend-for-frontend** (BFF) pattern from Sam Newman. Microsoft's [summary](https://learn.microsoft.com/en-us/azure/architecture/patterns/backends-for-frontends): "Create a separate backend service for each frontend interface."
+Next.js runs as an ECS Fargate service, built with `output: 'standalone'`, in private subnets behind the internal ALB. Its job is the **backend-for-frontend** (BFF) pattern from Sam Newman. Microsoft's [summary](https://learn.microsoft.com/en-us/azure/architecture/patterns/backends-for-frontends): "Create a separate backend service for each frontend interface." Netflix made the same move, shifting its front-end services from the Java API tier "to a BFF (backend for frontend), aka NodeQuark", written in JavaScript.
 
 The browser never sees a service URL or an access token. It holds a session cookie (`httpOnly`, `Secure`, `SameSite=Lax`), and the Next.js server turns that into an access token and calls services on the user's behalf.
 
@@ -117,6 +119,14 @@ It doesn't decide who may call whom. The docs say plainly that "Service Connect 
 If you need AWS to prove the caller's identity on every request, put that boundary on **[Amazon VPC Lattice](https://docs.aws.amazon.com/vpc-lattice/latest/ug/auth-policies.html)** instead. Its auth policies are IAM policies attached to a service or a whole service network, and callers sign their requests with SigV4. "Only the web tier's task role may call `GET /orders/*`" becomes a policy, not a convention.
 
 If you used AWS App Mesh for this: it reached end of support on 30 September 2026, and AWS points App Mesh users to Service Connect.
+
+Netflix arrived at the same design, a proxy next to every service, from the other direction ([Zero Configuration Service Mesh with On-Demand Cluster Discovery](https://netflixtechblog.com/zero-configuration-service-mesh-with-on-demand-cluster-discovery-ac6483b52a51)):
+
+- Its services used to find each other with Eureka and handle load balancing, retries and circuit breaking in a client library, Ribbon.
+- Over time the list grew to "adaptive concurrency limiting, circuit breaking, hedging, and fault injection", across Java, Node.js and Python clients.
+- "Keeping feature parity between all of these implementations and ensuring that they all behave the same way is challenging: what we want is a single, well-tested implementation of all of this functionality". So Netflix moved that logic into Envoy.
+
+Service Connect is a managed Envoy, but a deliberately small one. You can change its timeouts and TLS; its retries and outlier detection are built in; there's no circuit breaker, hedging or concurrency limit to configure. That's why the circuit breaker later in this post lives in application code.
 
 A service in CDK, with the per-request timeout and ECS's deployment circuit breaker:
 
@@ -179,6 +189,15 @@ export class JwtGuard implements CanActivate {
 ```
 
 Google's version of this is [ALTS](https://cloud.google.com/docs/security/encryption-in-transit/application-layer-transport-security), where "communications between services are mutually authenticated" and "identities are bound to entities instead of to a specific server name or host." You don't need Google's infrastructure to get the same property: a user token verified at every hop, plus a workload identity checked at every boundary.
+
+Forwarding the user's access token is the simple version, and Netflix has written about where it goes wrong ([Edge Authentication and Token-Agnostic Identity Propagation](https://netflixtechblog.com/edge-authentication-and-token-agnostic-identity-propagation-514e47e0b602)):
+
+- "Externally valid tokens were being minted deep down in the stack and they needed to be propagated all the way upstream, opening possibilities for them to be logged inappropriately or potentially mismanaged."
+- Services cracked tokens open and passed identity along "via request context headers, or even as URL parameters", with "no checks in place to ensure the integrity of the tokens or the data contained therein."
+
+Netflix's fix was to end every external token at the edge, in its Zuul gateway plus a set of Edge Authentication Services. The rest of the system receives an "integrity-protected token-agnostic identity object" called a Passport.
+
+In this stack, the BFF is the natural place for that exchange: verify the Cognito token once, mint a short-lived internal token whose audience is your services, and never let the external token past the web zone. It's more moving parts. It pays off once you have more than one kind of client token, or once tokens start showing up in logs.
 
 Calls that aren't on behalf of a user, like a nightly job or a webhook consumer, use their own credentials: a Cognito client-credentials token or, with Lattice, the task role. Never reuse a user's token after that user's request has finished.
 
@@ -280,6 +299,8 @@ I synthesized this stack and asserted against the generated CloudFormation:
 
 Turn checks like these into a unit test, and someone "temporarily" opening the database to the web tier becomes a failing build, not a review comment. Google's BeyondProd calls these places choke points: "Choke points allow for policies to be consistently enforced across services."
 
+Well-Architected's [SEC05-BP01](https://docs.aws.amazon.com/wellarchitected/latest/framework/sec05-bp01.html) and [SEC05-BP02](https://docs.aws.amazon.com/wellarchitected/latest/framework/sec05-bp02.html) cover the same ground: "Internet-facing components are separated from internal ones, so someone who reaches a public entry point cannot move freely toward sensitive systems." Those controls "are most reliable when they are expressed as code and deployed through automation rather than configured manually", which is the case for the CDK and the assertions above.
+
 ## When a dependency gets slow
 
 ![Sketch of a cascading failure. Next.js has renders waiting on orders. Orders is holding database connections while it waits on payments. Payments has gone from 80 ms to 8 s, and is the only thing actually wrong. Requests queue in Next.js, and the connection pool runs dry in orders. Without timeouts, the slowest dependency sets everyone's latency, and requests that never touch payments start failing too.](/blog/nextjs-nestjs-aws-security-zones/cascading-failure.svg)
@@ -295,6 +316,8 @@ Within a minute the whole site is timing out, and the only broken thing was one 
 
 Google's SRE book has a chapter on exactly this, [Addressing Cascading Failures](https://sre.google/sre-book/addressing-cascading-failures/). Netflix built [Hystrix](https://github.com/Netflix/Hystrix) to "stop cascading failures." AWS's [Builders' Library](https://aws.amazon.com/builders-library/) has a whole shelf on it. They reach for the same defences.
 
+The Well-Architected Framework's section on [designing interactions to withstand failures](https://docs.aws.amazon.com/wellarchitected/latest/framework/rel05.html) states the goal in one sentence: "Designing each interaction to expect failure is what keeps one struggling dependency from taking the rest of the system down with it."
+
 ### Timeouts, from a deadline
 
 Every network call gets a timeout, and they nest, with the longest on the outside:
@@ -304,9 +327,19 @@ Every network call gets a timeout, and they nest, with the longest on the outsid
 - **Service to service:** 1.5 seconds overall, 600 ms per attempt.
 - **Service Connect's per-request timeout:** a backstop slightly above the app's.
 
+Don't trust defaults here. [REL05-BP05](https://docs.aws.amazon.com/wellarchitected/latest/framework/rel05-bp05.html) says: "Set both connection and request timeouts on every call across a process boundary". Defaults "are often infinite or far higher than your service goals allow", and the 300-second `fetch` default and Service Connect's 15 seconds are both examples.
+
 How to pick the numbers, from AWS's [Timeouts, retries, and backoff with jitter](https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/): choose "an acceptable rate of false timeouts (such as 0.1%)", then use that latency percentile of the dependency (p99.9).
 
 Google adds **deadline propagation**: "a deadline is set high in the stack (e.g., in the frontend)", and each hop gets what's left. No backend should keep working on a request whose user has already given up.
+
+For idempotent reads with a long tail, Google adds **hedged requests** ([The Tail at Scale](https://research.google/pubs/the-tail-at-scale/), Dean and Barroso, 2013):
+
+- Send a second copy to another replica, and use whichever answers first.
+- Wait before sending it: "defer sending a secondary request until the first request has been outstanding for more than the 95th-percentile expected latency". That "limits the additional load to approximately 5%".
+- In Google's BigTable benchmark, hedging after 10 ms cut the p99.9 latency "from 1,800ms to 74ms while sending just 2% more requests."
+
+Count hedges against the same retry budget as retries.
 
 ### Retries: few, jittered, in one place
 
@@ -315,7 +348,9 @@ Retries turn a blip into a non-event, and an outage into a stampede. AWS and Goo
 - **Retry at one layer.** AWS: "our best practice is to retry at a single point in the stack". If every layer of a five-deep stack retries three times, "the load on the database will increase 243x." Google: retry only "at the layer immediately above the layer that is rejecting them."
 - **Cap them.** Google uses "a per-request retry budget of up to three attempts", plus a per-client budget: a request is retried "only as long as this ratio is below 10%". AWS limits retries locally with a token bucket.
 - **Jitter.** Exponential backoff alone synchronizes clients into waves. AWS: "Our solution is jitter." Google: "Always use randomized exponential backoff when scheduling retries."
-- **Only retry what's safe to repeat.** "APIs with side effects aren't safe to retry unless they provide idempotency" (AWS). For writes, send an idempotency key. [Stripe's `Idempotency-Key`](https://docs.stripe.com/api/idempotent_requests) is the well-known version: "Retries with the same key return the saved response". AWS models the same thing as a `ClientToken` in its own APIs ([Making retries safe with idempotent APIs](https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-apis/)).
+- **Only retry what's safe to repeat.** "APIs with side effects aren't safe to retry unless they provide idempotency" (AWS). For writes, send an idempotency key. [Stripe's `Idempotency-Key`](https://docs.stripe.com/api/idempotent_requests) is the well-known version: "Retries with the same key return the saved response". AWS models the same thing as a `ClientToken` in its own APIs ([Making retries safe with idempotent APIs](https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-apis/)). The Well-Architected practice is [REL04-BP04](https://docs.aws.amazon.com/wellarchitected/latest/framework/rel04-bp04.html), "Make mutating operations idempotent".
+
+[REL05-BP03](https://docs.aws.amazon.com/wellarchitected/latest/framework/rel05-bp03.html) sums up this whole section. Retry with "exponential backoff with jitter and a maximum attempt or elapsed-time limit", and "retry only errors that a retry can resolve, and stop on errors that will not". That last part is what `isRetryable` does in the code below.
 
 The AWS-specific trap: Service Connect's proxy already retries twice. Three attempts in your code times three in the proxy is nine requests to a service that's already struggling. With Service Connect in the path, one retry in application code is plenty.
 
@@ -461,7 +496,7 @@ A bulkhead limits how much of your service one dependency can use up. Microsoft'
 
 - **One call:** opossum's `capacity`, in the code above.
 - **One service:** its own ECS service, its own database user and its own pool in RDS Proxy.
-- **The whole system:** AWS's cell-based architecture. The Well-Architected Framework's [REL10-BP03](https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/rel_fault_isolation_use_bulkhead.html) says to "implement bulkhead architectures (also known as cell-based architectures)", and AWS goes further still with [shuffle sharding](https://aws.amazon.com/builders-library/workload-isolation-using-shuffle-sharding/).
+- **The whole system:** AWS's cell-based architecture. Well-Architected's [REL10-BP03](https://docs.aws.amazon.com/wellarchitected/latest/framework/rel10-bp03.html): "Bulkhead architectures, also called cell-based architectures, divide a workload into independent instances that each serve a subset of requests." AWS goes further still with [shuffle sharding](https://aws.amazon.com/builders-library/workload-isolation-using-shuffle-sharding/).
 
 Netflix's Hystrix did it with "thread and semaphore isolation"; Shopify's [Semian](https://github.com/Shopify/semian) does it for Ruby with semaphores.
 
@@ -471,7 +506,7 @@ Here AWS and Netflix publicly disagree. Hystrix advertised "Fallbacks and gracef
 
 Both are right about different kinds of fallback:
 
-- **A fallback that *leaves something out* is cheap.** Render the order page without the payment badge. It's obvious, and it gets exercised every time payments has a bad minute. That's Well-Architected's [REL05-BP01](https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/rel_mitigate_interaction_failure_graceful_degradation.html): "Application components should continue to perform their core function even if dependencies become unavailable."
+- **A fallback that *leaves something out* is cheap.** Render the order page without the payment badge. It's obvious, and it gets exercised every time payments has a bad minute. That's Well-Architected's [REL05-BP01](https://docs.aws.amazon.com/wellarchitected/latest/framework/rel05-bp01.html): "a component continues to deliver its core function even when a dependency is unhealthy." The same practice asks that "degraded pathways are tested and exercised, so they work when a real failure occurs", which answers AWS's own worry about fallback. Netflix's request categories (below) include one, DEGRADED_EXPERIENCE, for exactly this kind of request.
 - **A fallback that *substitutes* is dangerous.** "If payments is down, mark the order paid and reconcile later" is a second, rarely-run code path with business consequences. Do the first kind; return the second to the caller as an error.
 
 ### Load shedding
@@ -479,12 +514,31 @@ Both are right about different kinds of fallback:
 When demand exceeds capacity, serving everyone slowly is worse than serving most people normally and turning the rest away fast:
 
 - AWS sheds load to keep "predictable, consistent performance in the face of overload" ([Using load shedding to avoid overload](https://aws.amazon.com/builders-library/using-load-shedding-to-avoid-overload/)).
-- Google's SRE book: "return an HTTP 503 (service unavailable) to any incoming request when there are more than a given number" in flight. Its clients even throttle themselves, once their requests reach K times what the backend accepts. Google "generally prefer[s] the 2x multiplier."
+- Google's SRE book: "return an HTTP 503 (service unavailable) to any incoming request when there are more than a given number" in flight.
 - Netflix's [concurrency-limits](https://github.com/Netflix/concurrency-limits) picks that number automatically, borrowing "concepts from TCP congestion control."
 
-In this stack, that's three places:
+**Not all requests are equal.** Until 2019, Netflix "had on/off circuit breakers, but no progressive way to shed load" ([Keeping Netflix Reliable Using Prioritized Load Shedding](https://netflixtechblog.com/keeping-netflix-reliable-using-prioritized-load-shedding-6cc827b02f94)). Now its Zuul gateway puts every request in one of three buckets:
+
+- **NON_CRITICAL:** logs and background requests;
+- **DEGRADED_EXPERIENCE:** features like viewing history;
+- **CRITICAL:** anything that would stop playback.
+
+Each request also gets a priority score from 1 to 100. When a backend or Zuul itself is overloaded, Zuul drops traffic from the lowest priority up. Google's RPC system does the same with four criticality levels, from `CRITICAL_PLUS` down to `SHEDDABLE`, and an overloaded task "will reject requests of lower criticalities sooner."
+
+The BFF knows what each request is for, so it can tag it the same way:
+
+- checkout and payment are critical;
+- order history can degrade;
+- recommendations and analytics beacons can be shed.
+
+Shed from the bottom up, and tell clients when to come back. Netflix sends its apps a `maxRetries` and a `retryAfterSeconds` to stop retry storms; on the web, the standard version is a `503` with a `Retry-After` header. Well-Architected's [REL05-BP02](https://docs.aws.amazon.com/wellarchitected/latest/framework/rel05-bp02.html) asks for exactly that: requests over the limit "are rejected with a throttling response the client can detect and retry later."
+
+**Clients can shed too.** Google's adaptive throttling has each client track, over the last two minutes, how many requests it sent and how many the backend accepted. Once requests pass K times accepts, the client starts rejecting new requests itself, with probability `max(0, (requests - K * accepts) / (requests + 1))`. Google "generally prefer[s] the 2x multiplier." A request rejected at the client costs the backend nothing.
+
+In this stack, that's four places:
 
 - the WAF rate-based rule at the edge;
+- priority-based shedding in the BFF, with `Retry-After`;
 - `@nestjs/throttler` in each service, with Valkey-backed storage so the limit is shared across tasks;
 - opossum's `capacity` per dependency.
 
@@ -591,7 +645,7 @@ Keep those alarm definitions in each service's repo, next to the code. That's [t
 - **ECS's deployment circuit breaker** rolls back a deployment whose new tasks keep failing. It's the same idea as the request-level breaker, applied to releases. ECS also does blue/green, linear and canary deployments natively now.
 - **Expand, then contract** for schema changes. Add the new column, deploy code that writes both, backfill, switch reads, drop the old column. Each step deploys, and can be rolled back, on its own.
 - **Secrets** come from Secrets Manager through the task definition. They're "injected into your container when the container is initially started", so running tasks won't see a rotated value until they're replaced. That's one more reason to prefer IAM authentication for the database.
-- **Break things on purpose.** Netflix's [Chaos Monkey](https://netflix.github.io/chaosmonkey/) works by "randomly terminating instances in production to ensure that engineers implement their services" to survive it. AWS's managed version is Fault Injection Service. Start in staging, and find out whether your breaker actually opens.
+- **Break things on purpose.** Netflix's [Chaos Monkey](https://netflix.github.io/chaosmonkey/) works by "randomly terminating instances in production to ensure that engineers implement their services" to survive it. AWS's managed version is Fault Injection Service. Netflix tested its load-shedding buckets this way, shedding chosen priorities for a small group of real users. The first experiment found a race condition in its Android and iOS apps. Start in staging, and find out whether your breaker actually opens.
 
 ## How AWS, Google and Netflix do it
 
@@ -604,16 +658,24 @@ None of this is new. Most of it comes from a handful of public sources, worth re
 - Builders' Library: [Avoiding fallback in distributed systems](https://aws.amazon.com/builders-library/avoiding-fallback-in-distributed-systems/): why Amazon almost never uses fallback.
 - Builders' Library: [Making retries safe with idempotent APIs](https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-apis/) and [Static stability using Availability Zones](https://aws.amazon.com/builders-library/static-stability-using-availability-zones/).
 - Prescriptive Guidance: [circuit breaker](https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/circuit-breaker.html), [retry with backoff](https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/retry-backoff.html) and [transactional outbox](https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html).
-- Well-Architected: [REL05-BP01](https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/rel_mitigate_interaction_failure_graceful_degradation.html) on graceful degradation, [REL10-BP03](https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/rel_fault_isolation_use_bulkhead.html) on bulkheads and cells, and the [cell-based architecture](https://docs.aws.amazon.com/wellarchitected/latest/reducing-scope-of-impact-with-cell-based-architecture/reducing-scope-of-impact-with-cell-based-architecture.html) whitepaper.
+- Well-Architected Framework:
+  - [SEC05, Protecting networks](https://docs.aws.amazon.com/wellarchitected/latest/framework/sec05.html): network layers and traffic between them.
+  - [REL04](https://docs.aws.amazon.com/wellarchitected/latest/framework/rel04.html) and [REL05](https://docs.aws.amazon.com/wellarchitected/latest/framework/rel05.html), on designing interactions between services: idempotency, throttling, retries, timeouts, graceful degradation.
+  - [REL10](https://docs.aws.amazon.com/wellarchitected/latest/framework/rel10.html), on fault isolation and bulkheads.
+  - The [cell-based architecture](https://docs.aws.amazon.com/wellarchitected/latest/reducing-scope-of-impact-with-cell-based-architecture/reducing-scope-of-impact-with-cell-based-architecture.html) whitepaper.
 
 **Google**
 - SRE book: [Addressing Cascading Failures](https://sre.google/sre-book/addressing-cascading-failures/): deadline propagation, retry limits, load shedding.
 - SRE book: [Handling Overload](https://sre.google/sre-book/handling-overload/): the three-attempt and 10% retry budgets, and client-side throttling.
 - [BeyondProd](https://cloud.google.com/docs/security/beyondprod) and [ALTS](https://cloud.google.com/docs/security/encryption-in-transit/application-layer-transport-security): zero trust between services, with mutually authenticated service identities.
+- [The Tail at Scale](https://research.google/pubs/the-tail-at-scale/) (Dean and Barroso, 2013): hedged requests and other tail-latency techniques.
 
 **Netflix**
 - [Hystrix](https://github.com/Netflix/Hystrix): circuit breakers, isolation and fallbacks. It's in maintenance mode now, but its README is still the best short explanation of why.
 - [concurrency-limits](https://github.com/Netflix/concurrency-limits): adaptive load shedding.
+- [Keeping Netflix Reliable Using Prioritized Load Shedding](https://netflixtechblog.com/keeping-netflix-reliable-using-prioritized-load-shedding-6cc827b02f94): request buckets, priority scores, and backpressure for retry storms.
+- [Edge Authentication and Token-Agnostic Identity Propagation](https://netflixtechblog.com/edge-authentication-and-token-agnostic-identity-propagation-514e47e0b602): ending external tokens at the edge, and propagating a Passport instead.
+- [Zero Configuration Service Mesh with On-Demand Cluster Discovery](https://netflixtechblog.com/zero-configuration-service-mesh-with-on-demand-cluster-discovery-ac6483b52a51): why Netflix moved resilience features from client libraries into Envoy.
 - [Chaos Monkey](https://netflix.github.io/chaosmonkey/) and the [Principles of Chaos Engineering](https://principlesofchaos.org/).
 
 **Others**
@@ -639,6 +701,7 @@ None of this is new. Most of it comes from a handful of public sources, worth re
 **Resilience**
 - Timeouts nest from a deadline. Retries happen at one layer, capped and jittered, with idempotency keys on writes.
 - Each downstream dependency has a circuit breaker and a bulkhead, with an alarm on open.
+- Requests are tagged by priority, the lowest priority is shed first, and responses carry `Retry-After`.
 - ECS health checks are shallow; deep checks feed alarms only.
 - Shutdown is graceful: `enableShutdownHooks()`, and a deregistration delay near your slowest request.
 - Events go through an outbox to idempotent consumers, with an alarm on the dead-letter queue.

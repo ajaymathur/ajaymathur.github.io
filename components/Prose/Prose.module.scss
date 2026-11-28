@@ -76,4 +76,14 @@
     border-top: 1px solid var(--color-border);
     margin: 2rem 0;
   }
+
+  img {
+    display: block;
+    margin: 1.75rem auto;
+  }
+}
+
+// Hand-drawn diagrams are dark ink on transparent; flip them the same way Excalidraw's dark mode does.
+:global([data-theme='dark']) .prose img[src$='.svg'] {
+  filter: invert(93%) hue-rotate(180deg);
 }
